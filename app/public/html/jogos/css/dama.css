@@ -1,0 +1,163 @@
+:root {
+  --light: #f0d9b5;
+  --dark: #b58863;
+  --board-size: 550px;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, Segoe UI, Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #111827;
+  color: #e6edf3;
+}
+
+header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+button, select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 0;
+  background: #1f2937;
+  color: #e6edf3;
+  cursor: pointer;
+}
+
+.game-area {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.board {
+  width: var(--board-size);
+  height: var(--board-size);
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 4px solid #0b1220;
+}
+
+.cell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cell[data-color="light"] {
+  background: linear-gradient(180deg, var(--light), #e9d8b7);
+}
+
+.cell[data-color="dark"] {
+  background: linear-gradient(180deg, var(--dark), #a56f47);
+}
+
+.piece {
+  width: 72%;
+  height: 72%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+}
+
+.piece.red {
+  background: linear-gradient(180deg, #ff6b6b, #c53030);
+  color: white;
+}
+
+.piece.white {
+  background: linear-gradient(180deg, #fff, #dcdcdc);
+  color: #111;
+}
+
+.piece.king::after {
+  content: "\2605";
+  position: absolute;
+  top: 6%;
+  right: 6%;
+  font-size: 0.9rem;
+}
+
+.cell.highlight {
+  outline: 4px solid rgba(96,165,250,0.6);
+  z-index: 2;
+}
+
+.cell.capture {
+  outline: 4px solid rgba(239,68,68,0.6);
+}
+
+.info {
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status {
+  background: #0f1724;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.board-footer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+#popupInstrucoes {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2,6,23,0.6);
+}
+
+#popupInstrucoes .conteudo {
+  background: #0f1724;
+  padding: 18px;
+  border-radius: 10px;
+  max-width: 640px;
+}
+
+footer {
+  margin-top: 10px;
+  color: #9aa3b2;
+  font-size: 13px;
+}
+ 

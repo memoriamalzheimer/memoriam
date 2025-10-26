@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jogo de Dama</title>
+  <link rel="stylesheet" href="./css/dama.css">
+</head>
+<body>
+  <header>
+    <h1>Jogo de Dama</h1>
+    <div class="controls">
+      <select id="ladoJogador">
+        <option value="red">Jogador: Vermelho</option>
+        <option value="white">Jogador: Branco</option>
+      </select>
+      <button id="reiniciar">Reiniciar</button>
+      <button id="instrucoesBtn">Como jogar</button>
+    </div>
+  </header>
+
+  <div class="game-area">
+    <div id="board" class="board" aria-label="tabuleiro de dama"></div>
+
+    <div class="info">
+      <div class="status">
+        <p><strong>Vez:</strong> <span id="turnLabel">Vermelho</span></p>
+        <p><strong>Capturas:</strong></p>
+        <p>Vermelho: <span id="scoreRed">0</span> — Branco: <span id="scoreWhite">0</span></p>
+      </div>
+      <div class="board-footer">
+        <button id="undo" disabled>Desfazer</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="popupInstrucoes" style="display:none">
+    <div class="conteudo">
+      <h2>Como jogar</h2>
+      <p>Clique em uma peça sua para selecionar, depois clique na casa que deseja ir. Peças se movem diagonalmente para frente. Capture pulando a peça adversária. Ao chegar na última fileira, a peça vira <em>dama</em> (king) e pode se mover para trás. Capturas são obrigatórias.</p>
+      <button id="fecharPopup">Entendi</button>
+    </div>
+  </div>
+
+
+  <script src="./js/dama.js"></script>
+</body>
+</html>

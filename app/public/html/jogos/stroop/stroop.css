@@ -1,0 +1,91 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Nunito", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ffffff, #ffffff);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 5px #137fd9;
+      color: black;
+    }
+
+    #game-container {
+      background: white;
+      color: black;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    #word {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      height: 3rem;
+    }
+
+    .btn-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    button {
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      color: white;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+
+    #score {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      color: #004279;
+      font-weight: bold;
+    }
+
+    #timer {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #137fd9;
+    }
+
+    #restart {
+      margin-top: 1rem;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #137fd9;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    #restart:hover {
+      background-color: #0b5fa8;
+    }

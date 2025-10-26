@@ -1,0 +1,8 @@
+node_modules/
+config/
+*.sql
+.env
+.DS_Store
+*.zip
+*.rar
+*.mp4

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/favicon/cerebro.png">
+<link rel="stylesheet" href="jdmemoria.css">
+<title>Jogo da Memória</title>
+</head>
+ 
+<body>
+<header>
+<nav class="itens">
+<ul>
+<li class="logo">
+<img src="../assets/logo.png" alt="logo" draggable="false">
+<h2>Memoriam</h2>
+</li>
+<li><a href="../../views/home/inicio.ejs">Início</a></li>
+<li><a href="jogos.html">Jogos</a></li>
+<li><a href="../../views/usuarios/login.ejs">Sair</a></li>
+</ul>
+</nav>
+</header>
+ 
+<main>
+<h1>Jogo da Memória</h1>
+ 
+<div class="painel">
+<div class="controle">
+<label for="dificuldade">Dificuldade:</label>
+<select id="dificuldade">
+<option value="facil">Fácil (5x4)</option>
+<option value="medio">Médio (6x6)</option>
+<option value="dificil">Difícil (8x6)</option>
+</select>
+<button id="iniciar">Iniciar Jogo</button>
+</div>
+ 
+<div class="status">
+<p>⏱️ Tempo: <span id="tempo">00:00</span></p>
+<p>🎯 Tentativas: <span id="tentativas">0</span></p>
+</div>
+</div>
+ 
+<div id="tabuleiro" class="tabuleiro"></div>
+</main>
+ 
+<footer>
+        <div class="footer-top">
+            <ul>
+                <li>Início</li>
+                <li>Sobre</li>
+                <li>Jogos</li>
+            </ul>
+            <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+             <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            © 2025 Todos os direitos reservados.
+        </div>
+    </footer>
+ 
+<script src="jdmemoria.js"></script>
+</body>
+</html>

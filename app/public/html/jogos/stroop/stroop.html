@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="stroop.css">
+  <title>Stroop</title>
+  <style>
+    
+  </style>
+</head>
+<body>
+  <h1>🧠 Jogo de Stroop</h1>
+
+  <div id="game-container">
+    <div id="word">Pronto?</div>
+
+    <div class="btn-container" id="buttons"></div>
+
+    <div id="score">Pontuação: 0</div>
+    <div id="timer">Tempo: 30s</div>
+    <button id="restart">Jogar Novamente</button>
+  </div>
+
+  <script>
+    const cores = ["Vermelho", "Azul", "Verde", "Amarelo"];
+    const valores = ["red", "blue", "green", "yellow"];
+    const wordEl = document.getElementById("word");
+    const buttonsEl = document.getElementById("buttons");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+    const restartBtn = document.getElementById("restart");
+
+    let pontuacao = 0;
+    let tempo = 30;
+    let intervalo = null;
+
+    function iniciarJogo() {
+      pontuacao = 0;
+      tempo = 30;
+      scoreEl.textContent = "Pontuação: 0";
+      timerEl.textContent = "Tempo: 30s";
+      restartBtn.style.display = "none";
+      gerarRodada();
+      intervalo = setInterval(() => {
+        tempo--;
+        timerEl.textContent = "Tempo: " + tempo + "s";
+        if (tempo <= 0) fimDeJogo();
+      }, 1000);
+    }
+
+    function gerarRodada() {
+      buttonsEl.innerHTML = "";
+      const indiceTexto = Math.floor(Math.random() * cores.length);
+      const indiceCor = Math.floor(Math.random() * valores.length);
+
+      wordEl.textContent = cores[indiceTexto];
+      wordEl.style.color = valores[indiceCor];
+
+      const respostaCorreta = valores[indiceCor];
+
+      valores.forEach((cor, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = cores[i];
+        btn.style.backgroundColor = cor;
+        btn.addEventListener("click", () => verificarResposta(cor, respostaCorreta));
+        buttonsEl.appendChild(btn);
+      });
+    }
+
+    function verificarResposta(escolhida, correta) {
+      if (escolhida === correta) {
+        pontuacao++;
+        scoreEl.textContent = "Pontuação: " + pontuacao;
+      }
+      gerarRodada();
+    }
+
+    function fimDeJogo() {
+      clearInterval(intervalo);
+      wordEl.textContent = "⏰ Fim de jogo!";
+      wordEl.style.color = "#333";
+      buttonsEl.innerHTML = "";
+      restartBtn.style.display = "inline-block";
+    }
+
+    restartBtn.addEventListener("click", iniciarJogo);
+
+    // Iniciar automaticamente ao abrir
+    iniciarJogo();
+  </script>
+</body>
+</html>

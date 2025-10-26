@@ -1,0 +1,156 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  text-align: center;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+body, p, li {
+    line-height: 1.8;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 1.5rem 0 1rem 0;
+}
+
+p {
+    margin-bottom: 1.8rem;
+}
+ 
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+ 
+.social img {
+  width: 20px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+ 
+.social img:hover {
+  transform: scale(1.1);
+}
+ 
+.dropdown-login {
+  position: relative;
+  cursor: pointer;
+}
+ 
+.dropdown-content-login {
+  display: none;
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  flex-direction: column;
+  min-width: 140px;
+}
+ 
+.dropdown-content-login a {
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #333;
+  display: block;
+}
+ 
+.dropdown-content-login a:hover {
+  background-color: #f2f2f2;
+}
+ 
+.dropdown-login:hover .dropdown-content-login {
+  display: flex;
+}
+
+main {
+  padding: 40px 20px;
+}
+ 
+h1 {
+  font-size: 2.2em;
+  margin-bottom: 20px;
+  color: #222;
+}
+ 
+.infos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+ 
+.infos span {
+  font-size: 1.1em;
+  background-color: #fff;
+  padding: 8px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+ 
+#reiniciar {
+  padding: 8px 20px;
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+ 
+#reiniciar:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+#tabuleiro {
+  width: 90vmin;
+  height: 90vmin;
+  max-width: 700px;
+  max-height: 700px;
+  margin: 0 auto;
+  display: grid;
+  border: 3px solid #007bff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+ 
+.peca {
+  background-repeat: no-repeat;
+  background-size: cover;
+  cursor: grab;
+  transition: transform 0.2s;
+}
+ 
+.peca:active {
+  cursor: grabbing;
+  transform: scale(1.02);
+}
+ 
+footer {
+  margin-top: 40px;
+  padding: 15px;
+  background-color: #fff;
+  color: #555;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+ 
+@media (max-width: 768px) {
+  #tabuleiro {
+    width: 95vmin;
+    height: 95vmin;
+  }
+}}
