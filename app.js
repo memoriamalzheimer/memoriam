@@ -1,6 +1,7 @@
 var app = require('./config/express')();
 require('./app/routes/usuarios')(app);
 
-app.listen(3000, function(){
-    console.log('Servidor Rodando!');
+const PORT = process.env.PORT || 3000;  
+app.listen(PORT, function(){
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
