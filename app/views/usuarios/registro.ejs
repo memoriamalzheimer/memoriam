@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/assets/favicon/cerebro.png">
+  <title>Cadastro</title>
+  <link rel="stylesheet" href="/css/registro.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="right">
+      <img src="/assets/user.png" alt="Cadastro">
+      <h2>CADASTRE-SE</h2>
+      <p class="login-link">Já possui uma conta? <a href="/login">Entrar</a></p>
+
+      <ul class="erros">
+        <% if (errosValidacao && errosValidacao.length> 0) { %>
+          <% errosValidacao.forEach(function(erro) { %>
+            <li>
+              <%= erro.msg %>
+            </li>
+            <% }) %>
+              <% } %>
+      </ul>
+
+      <form name="cadastro" id="cadastroForm" action="/registro" method="post">
+        <div class="form-group">
+          <input type="text" name="nome" placeholder="Nome" value="<%= usuario.nome %>" required>
+          <div id="user"></div>
+        </div>
+        <div class="form-group">
+          <input type="email" name="email" placeholder="E-mail" value="<%= usuario.email %>" required
+            autocomplete="email">
+          <div id="envelope"></div>
+        </div>
+        <div class="form-group">
+          <input type="password" id="senha" name="senha" placeholder="Senha" required>
+          <div id="icon"></div>
+        </div>
+        <div class="form-group">
+          <input type="password" id="senhaConfirmacao" name="senhaConfirmacao" placeholder="Confirme a Senha" required>
+          <div id="iconConfirmacao" class="icon"></div>
+        </div>
+        <button type="submit">Cadastrar</button>
+
+        <div class="form-group">
+          <a href="/auth/google" class="google-btn">
+            <img src="/assets/google.png" alt="Google">
+            <span>Cadastrar com Google</span>
+          </a>
+        </div>
+        <p class="info-termos">
+          Ao se cadastrar, você concorda com nossos
+          <a href="/termos">Termos de Uso</a> e
+          <a href="/privacidade">Política de Privacidade</a>.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+
+  <script>
+    const formulario = document.getElementById('cadastroForm');
+    const senha = document.getElementById('senha');
+    const senhaConfirmacao = document.getElementById('senhaConfirmacao');
+    const iconSenha = document.getElementById('icon');
+    const iconConfirmacao = document.getElementById('iconConfirmacao');
+    const errosUl = document.querySelector('.erros');
+    const inputs = formulario.querySelectorAll('input');
+
+    function showHide(input, icon) {
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.add('hide');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('hide');
+      }
+    }
+
+    if (iconSenha) iconSenha.addEventListener('click', () => showHide(senha, iconSenha));
+    if (iconConfirmacao) iconConfirmacao.addEventListener('click', () => showHide(senhaConfirmacao, iconConfirmacao));
+
+    formulario.addEventListener('submit', function (e) {
+      errosUl.innerHTML = '';
+      const s1 = senha.value.trim();
+      const s2 = senhaConfirmacao.value.trim();
+      let erros = [];
+
+      if (!s1 || !s2) erros.push('Preencha ambos os campos de senha.');
+      if (s1 && s2 && s1 !== s2) erros.push('As senhas não coincidem, tente novamente.');
+
+      if (erros.length > 0) {
+        e.preventDefault();
+        erros.forEach(msg => {
+          const li = document.createElement('li');
+          li.textContent = msg;
+          errosUl.appendChild(li);
+        });
+      }
+    });
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          } else {
+            formulario.submit();
+          }
+        }
+      });
+    });
+
+
+    document.addEventListener("keypress", function (e) {
+      if (e.key === 'Enter') {
+
+        var btn = document.querySelector("#submit");
+
+        btn.click();
+
+      }
+    });
+  </script>
+</body>
+
+</html>

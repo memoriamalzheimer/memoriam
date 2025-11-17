@@ -1,0 +1,277 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(to right, #e0f2fe, #bfdbfe, #93c5fd);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-y: hidden;
+}
+
+form {
+  background-color: #fff;
+  color: #333;
+  border-radius: 20px;
+  padding: 25px 35px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: fadeIn 0.7s ease-in-out;
+  position: relative;
+}
+
+form h1 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+form span {
+  font-size: 0.95rem;
+  color: #555;
+  display: block;
+  margin-bottom: 25px;
+}
+
+form input {
+  width: 100%;
+  padding: 12px 15px;
+  padding-left: 45px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  margin-bottom: 18px;
+}
+
+form input:focus {
+  border-color: #2575fc;
+  box-shadow: 0 0 6px rgba(37, 117, 252, 0.3);
+}
+
+#icon,
+#iconConfirmacao {
+  position: absolute;
+  left: 12px;
+  top: 35%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background-image: url('../assets/lock.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+#icon.hide,
+#iconConfirmacao.hide {
+  background-image: url('../assets/unlock.svg');
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #2575fc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  margin-top: 5px;
+}
+
+button:hover {
+  background: #1a5cd8;
+}
+
+#link {
+  display: block;
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+#link a {
+  color: #2575fc;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#link a:hover {
+  text-decoration: underline;
+}
+
+#nada {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  form {
+    max-width: 360px;
+    padding: 22px 28px;
+  }
+
+  form h1 {
+    font-size: 1.6rem;
+  }
+
+  form input {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  form {
+    max-width: 320px;
+    padding: 20px 25px;
+  }
+
+  form h1 {
+    font-size: 1.5rem;
+  }
+
+  form input {
+    font-size: 0.9rem;
+    padding-left: 40px;
+  }
+
+  #link {
+    font-size: 0.85rem;
+  }
+
+  #nada {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+
+  form {
+    padding: 18px 20px;
+    border-radius: 14px;
+  }
+
+  form h1 {
+    font-size: 1.3rem;
+  }
+
+  form input {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  button {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  #link {
+    font-size: 0.8rem;
+  }
+
+  #nada {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  form {
+    max-width: 450px;
+    padding: 30px 40px;
+  }
+
+  form h1 {
+    font-size: 2rem;
+  }
+
+  form input {
+    font-size: 1.05rem;
+    padding-left: 50px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(to right, #090b0c, #172230, #091829);
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    background-color: #1e2329 !important;
+    border: 1px solid #3b82f6 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+    caret-color: #e6edf3 !important;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
+  form {
+    background-color: #12161b;
+    color: #e6edf3;
+  }
+
+  #icon,
+  #iconConfirmacao {
+    filter: invert(1);
+  }
+
+  form h1 {
+    color: #93c5fd;
+  }
+
+  form span,
+  #link {
+    color: #c9d1d9;
+  }
+
+  form input {
+    background-color: #1e2329;
+    border: 1px solid #444;
+    color: #e6edf3;
+  }
+
+  form input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+  }
+
+  button {
+    background: #3b82f6;
+  }
+
+  button:hover {
+    background: #2563eb;
+  }
+
+  #nada {
+    color: #f87171;
+  }
+}

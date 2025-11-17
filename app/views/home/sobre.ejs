@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../assets/favicon/cerebro.png">
+    <link rel="stylesheet" href="/css/sobre.css">
+    <link rel="stylesheet" href="/css/configgerais.css">
+    <title>Memoriam: Sobre</title>
+</head>
+
+<body>
+    <header>
+        <nav class="itens">
+            <ul>
+                <li class="logo">
+                    <img src="../../assets/logo.png" alt="logo" draggable="false">
+                    <h2>Memoriam</h2>
+                    <span class="social">
+                        <img src="../../assets/instagram.svg" draggable="false" alt="Instagram">
+                        <img src="../../assets/facebook.svg" draggable="false" alt="Facebook">
+                        <img src="../../assets/twitter.svg" draggable="false" alt="Twitter">
+                    </span>
+                </li>
+                <li>
+                    <a href="<%= usuario ? '/inicio' : '/' %>">Início</a>
+                </li>
+                <li><a href="#" class="ativo">Sobre</a></li>
+                <li><a href="/jogos">Jogos</a></li>
+                <li><a href="/faq">Perguntas Frequentes</a></li>
+                <li><a href="/convite">Convites</a></li>
+
+                <li class="dropdown-login">
+                    <% if (usuario) { %>
+                        <a href="/logout">Sair</a>
+                        <% } else { %>
+                            <span class="dropdown-toggle">Login ▼</span>
+                            <div class="dropdown-content-login">
+                                <a href="/login">Entrar</a>
+                                <a href="/registro">Registrar</a>
+                            </div>
+                            <% } %>
+                </li>
+
+            </ul>
+        </nav>
+    </header>
+
+
+    <main class="sobre-container">
+        <section class="introducao">
+            <h1>Sobre o Projeto Memoriam</h1>
+            <p>
+                O <strong>Memoriam</strong> é um projeto desenvolvido como Trabalho de Conclusão de Curso (TCC) com o
+                objetivo de criar
+                uma ferramenta digital que auxilie no acompanhamento e estímulo cognitivo de pessoas em tratamento do
+                <strong>Alzheimer</strong>.
+                Nosso propósito é unir tecnologia, cuidado e empatia para melhorar a qualidade de vida de pacientes e
+                familiares.
+            </p>
+        </section>
+
+        <section class="doenca">
+            <h2>O que é o Alzheimer?</h2>
+            <p>
+                A <strong>Doença de Alzheimer</strong> é uma condição neurodegenerativa progressiva que afeta
+                principalmente a memória,
+                o raciocínio e o comportamento. Com o passar do tempo, o cérebro do paciente sofre perdas significativas
+                de células nervosas,
+                comprometendo suas funções cognitivas e dificultando atividades do cotidiano.
+            </p>
+            <p>
+                Apesar de ainda não haver cura, o diagnóstico precoce e o acompanhamento contínuo podem retardar o
+                avanço da doença,
+                proporcionando mais autonomia e qualidade de vida para o paciente. O estímulo mental e o engajamento em
+                atividades cognitivas
+                são aliados fundamentais nesse processo.
+            </p>
+        </section>
+
+        <section class="ferramenta">
+            <h2>Como o Memoriam pode ajudar?</h2>
+            <p>
+                O Memoriam oferece uma plataforma acessível e intuitiva, com atividades e jogos desenvolvidos para
+                exercitar funções
+                como memória, atenção, linguagem e raciocínio lógico. A proposta é que o usuário realize os exercícios
+                regularmente,
+                estimulando o cérebro de forma leve e divertida.
+            </p>
+            <p>
+                Além disso, a ferramenta busca apoiar cuidadores e familiares, oferecendo um ambiente digital simples e
+                prático para
+                acompanhar o progresso do usuário. Tudo isso é feito de forma segura, com os dados armazenados
+                localmente no navegador,
+                garantindo privacidade total.
+            </p>
+        </section>
+
+        <section class="importancia">
+            <h2>A importância de uma ferramenta online</h2>
+            <p>
+                Com o avanço da tecnologia, recursos digitais se tornaram aliados valiosos na área da saúde. Uma
+                ferramenta online como o
+                Memoriam amplia o acesso a exercícios cognitivos, permitindo que o tratamento seja continuado em casa,
+                com conforto e
+                autonomia. Isso é especialmente importante para pacientes que enfrentam dificuldades de locomoção ou que
+                vivem longe de
+                centros especializados.
+            </p>
+            <p>
+                Acreditamos que a tecnologia, quando usada com propósito e sensibilidade, pode transformar o cuidado com
+                o Alzheimer —
+                tornando o processo mais humano, acolhedor e acessível.
+            </p>
+        </section>
+
+        <section class="missao">
+            <h2>Nossa missão</h2>
+            <p>
+                Nossa missão é promover o bem-estar cognitivo e emocional de pessoas com Alzheimer, oferecendo uma
+                ferramenta gratuita,
+                educativa e de fácil uso. Queremos contribuir para uma sociedade mais consciente e solidária, em que a
+                memória,
+                a dignidade e o cuidado sejam sempre valorizados.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-top">
+            <ul>
+                <li>Início</li>
+                <li>Sobre</li>
+                <li>Jogos</li>
+            </ul>
+            <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+            <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            © 2025 Todos os direitos reservados.
+        </div>
+    </footer>
+    <script src="../../js/atraso.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Videochamada</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body { font-family: Inter, Arial; background:#f3f4f6; color:#111827; margin:0; padding:18px; display:flex; flex-direction:column; align-items:center; }
+    .top { width:100%; max-width:1100px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .videos { display:flex; gap:12px; width:100%; max-width:1100px; justify-content:center; flex-wrap:wrap; }
+    video { background:#000; border-radius:10px; width:48%; max-width:560px; height:auto; }
+    .controls { margin-top:12px; display:flex; gap:8px; align-items:center; }
+    button { padding:8px 12px; border-radius:8px; border:0; cursor:pointer; }
+    .btn-red { background:#ef4444; color:white; }
+    .btn-green { background:#059669; color:white; }
+    .btn-gray { background:#374151; color:white; }
+    .info { font-size:14px; color:#374151; }
+    @media (prefers-color-scheme: dark) {
+      body{ background:#071025; color:#e6edf3 }
+      .info{ color:#9aa3b2 }
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h2>Videochamada</h2>
+    <div class="info" id="infoStatus">Conectando...</div>
+  </div>
+
+  <div class="videos">
+    <video id="localVideo" autoplay muted playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+  </div>
+
+  <div class="controls">
+    <button id="toggleCam" class="btn-gray">Desligar Câmera</button>
+    <button id="toggleMic" class="btn-gray">Desligar Microfone</button>
+    <button id="endCall" class="btn-red">Encerrar chamada</button>
+  </div>
+
+<script>
+  (function(){
+    const socket = io();
+    const infoStatus = document.getElementById('infoStatus');
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const toggleCamBtn = document.getElementById('toggleCam');
+    const toggleMicBtn = document.getElementById('toggleMic');
+    const endCallBtn = document.getElementById('endCall');
+
+    const sala = new URL(window.location.href).searchParams.get('sala');
+    if (!sala) {
+      alert('Sala inválida');
+      window.location.href = '/convite';
+      return;
+    }
+
+    let pc = null;
+    let localStream = null;
+    let isCaller = false;
+    let camEnabled = true;
+    let micEnabled = true;
+
+    const config = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' }
+       ]
+    };
+
+    socket.on('connect', () => {
+      infoStatus.textContent = 'Conectado ao servidor — entrando na sala...';
+      socket.emit('joinCall', { sala });
+       iniciarMedia();
+    });
+
+    socket.on('disconnect', () => {
+      infoStatus.textContent = 'Desconectado.';
+    });
+
+     socket.on('webrtc-offer', async ({ from, offer }) => {
+      console.log('offer recebido', offer);
+      if (!pc) await criarPeer(false);
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      socket.emit('webrtc-answer', { sala, answer: pc.localDescription });
+    });
+
+    socket.on('webrtc-answer', async ({ from, answer }) => {
+      console.log('answer recebido', answer);
+      if (!pc) return;
+      await pc.setRemoteDescription(new RTCSessionDescription(answer));
+    });
+
+    socket.on('webrtc-candidate', async ({ from, candidate }) => {
+      try {
+        if (!pc) return;
+        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+      } catch (err) {
+        console.warn('Erro ao adicionar candidate', err);
+      }
+    });
+
+    socket.on('peer-left', ({ id }) => {
+      infoStatus.textContent = 'O outro participante saiu.';
+      if (remoteVideo.srcObject) {
+         remoteVideo.srcObject = null;
+      }
+       if (pc) {
+        try { pc.close(); } catch(e) {}
+        pc = null;
+      }
+    });
+
+    async function iniciarMedia() {
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+        localVideo.srcObject = localStream;
+         await criarPeer(true);
+      } catch (err) {
+        alert('Não foi possível acessar câmera/microfone: ' + err.message);
+        console.error(err);
+      }
+    }
+
+    async function criarPeer(asCaller) {
+      isCaller = asCaller;
+      pc = new RTCPeerConnection(config);
+
+       pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit('webrtc-candidate', { sala, candidate: event.candidate });
+        }
+      };
+
+      pc.ontrack = (event) => {
+         remoteVideo.srcObject = event.streams[0];
+      };
+
+       if (localStream) {
+        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+      }
+
+       if (isCaller) {
+        try {
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+          socket.emit('webrtc-offer', { sala, offer: pc.localDescription });
+          infoStatus.textContent = 'Oferecendo conexão (esperando resposta)...';
+        } catch (err) {
+          console.error('Erro criando offer', err);
+        }
+      } else {
+        infoStatus.textContent = 'Aguardando offer...';
+      }
+
+      return pc;
+    }
+
+    // controls
+    toggleCamBtn.onclick = () => {
+      if (!localStream) return;
+      camEnabled = !camEnabled;
+      localStream.getVideoTracks().forEach(t => t.enabled = camEnabled);
+      toggleCamBtn.textContent = camEnabled ? 'Desligar Câmera' : 'Ligar Câmera';
+    };
+    toggleMicBtn.onclick = () => {
+      if (!localStream) return;
+      micEnabled = !micEnabled;
+      localStream.getAudioTracks().forEach(t => t.enabled = micEnabled);
+      toggleMicBtn.textContent = micEnabled ? 'Desligar Microfone' : 'Ligar Microfone';
+    };
+
+    endCallBtn.onclick = () => {
+      encerrar();
+      window.location.href = '/convite';
+    };
+
+    function encerrar() {
+      try {
+        socket.emit('leaveCall', { sala });
+      } catch(e){}
+      if (pc) {
+        try { pc.getSenders().forEach(s => { try { if (s.track) s.track.stop(); } catch(e){} }); } catch(e){}
+        try { pc.close(); } catch(e){}
+        pc = null;
+      }
+      if (localStream) {
+        try { localStream.getTracks().forEach(t => t.stop()); } catch(e){}
+        localStream = null;
+      }
+      remoteVideo.srcObject = null;
+      localVideo.srcObject = null;
+    }
+
+     socket.on('peer-joined', ({ id }) => {
+       if (!pc) {
+        iniciarMedia();
+      } else {
+       }
+    });
+
+     window.addEventListener('beforeunload', () => {
+      try { socket.emit('leaveCall', { sala }); } catch(e){}
+    });
+
+  })();
+</script>
+</body>
+</html>

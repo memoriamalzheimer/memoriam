@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/assets/favicon/cerebro.png">
+    <link rel="stylesheet" href="/css/configgerais.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <title>Memoriam Início</title>
+</head>
+
+<body>
+    <header>
+        <nav class="itens">
+            <ul>
+                <li class="logo">
+                    <img src="/assets/logo.png" alt="logo" draggable="false">
+                    <h2>Memoriam</h2>
+                    <span class="social">
+                        <img class="instagram" src="/assets/instagram.svg" draggable="false" alt="Instagram">
+                        <img class="facebook" src="/assets/facebook.svg" draggable="false" alt="Facebook">
+                        <img class="twitter" src="/assets/twitter.svg" draggable="false" alt="Twitter">
+                    </span>
+                </li>
+                <li><a href="#" class="ativo">Início</a></li>
+                <li><a href="/sobre">Sobre</a></li>
+                <li><a href="/jogos">Jogos</a></li>
+                <li><a href="/faq">Perguntas Frequentes</a></li>
+                <li><a href="/convite">Convites</a></li>
+                <li><a href="/videochamada">Vídeo</a></li>
+                <li class="dropdown-login">
+                    <% if (usuario) { %>
+                        <a href="/logout">Sair</a>
+                    <% } else { %>
+                        <span class="dropdown-toggle">Login ▼</span>
+                        <div class="dropdown-content-login">
+                            <a href="/login">Entrar</a>
+                            <a href="/registro">Registrar</a>
+                        </div>
+                    <% } %>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="fundo">
+            <button class="prev">&#10094;</button>
+            <h1>Bem-vindo, <%= usuario.nome %>!</h1>
+            <button class="next">&#10095;</button>
+        </div>
+
+        <section id="sobre">
+            <div class="titulo">
+                <h1>O que fazemos:</h1>
+            </div>
+
+            <div class="conteudo">
+                <div>
+                    <img src="/assets/cerebro.svg" draggable="false" alt="">
+                    <h2>Treino Cognitivo</h2>
+                    <p>O Memoriam é um projeto dedicado a auxiliar pessoas no cuidado com a memória e bem-estar.</p>
+                </div>
+
+                <div>
+                    <img src="/assets/heart.svg" draggable="false" alt="">
+                    <h2>Doe</h2>
+                    <p>Nosso objetivo é criar recursos acessíveis e interativos para estimular a memória.</p>
+                </div>
+
+                <div>
+                    <img src="/assets/game.svg" draggable="false" alt="">
+                    <h2>Jogos Estimuladores Cerebrais</h2>
+                    <p>Experiências lúdicas e educativas que podem ser utilizadas diariamente.</p>
+                </div>
+
+                <div>
+                    <img src="/assets/group.svg" draggable="false" alt="">
+                    <h2>Suporte da Comunidade</h2>
+                    <p>Recursos acessíveis e interativos para estimular a memória.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="sobre">
+            <div class="titulo">
+                <h1>História do Alzheimer</h1>
+            </div>
+
+            <div class="linha esquerda">
+                <div class="imagem">
+                    <img src="https://ichef.bbci.co.uk/ace/ws/640/cpsprodpb/bd36/live/6df26860-298b-11ee-b1d7-8fdc93c2782e.jpg.webp"
+                        alt="ALois Alzheimer" draggable="false">
+                </div>
+                <div class="texto">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean feugiat elementum quam, in
+                        rhoncus diam maximus ornare. Sed id magna vel augue fringilla congue. Mauris aliquam odio
+                        mauris, at euismod nisl lobortis sit amet. Duis tellus odio, vulputate at efficitur vel,
+                        ullamcorper porttitor urna...</p>
+                </div>
+            </div>
+
+            <div class="linha direita">
+                <div class="imagem">
+                    <img src="https://ichef.bbci.co.uk/ace/ws/640/cpsprodpb/5acf/live/29381ac0-2996-11ee-b1d7-8fdc93c2782e.jpg.webp"
+                        alt="August Deter" draggable="false">
+                </div>
+                <div class="texto">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean feugiat elementum quam, in
+                        rhoncus diam maximus ornare. Sed id magna vel augue fringilla congue. Mauris aliquam odio
+                        mauris, at euismod nisl lobortis sit amet. Duis tellus odio, vulputate at efficitur vel,
+                        ullamcorper porttitor urna...</p>
+                </div>
+            </div>
+
+            <div class="titulo">
+                <h1>O que é o Alzheimer</h1>
+            </div>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+
+            <div class="titulo">
+                <h1>Sintomas</h1>
+            </div>
+            <p>Alguns dos sintomas mais comuns são:</p>
+            <ol class="sintomas">
+                <li>
+                    <strong>Perda de memória que interrompe a vida diária:</strong>
+                    <ul>
+                        <li>Esquecer informações recém-aprendidas.</li>
+                        <li>Repetir perguntas ou histórias.</li>
+                        <li>Esquecer datas ou compromissos importantes.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Desafios no planejamento ou na resolução de problemas:</strong>
+                    <ul>
+                        <li>Dificuldade para seguir receitas ou gerenciar contas.</li>
+                        <li>Demora para concluir tarefas que antes eram simples.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Dificuldade em completar tarefas familiares:</strong>
+                    <ul>
+                        <li>Esquecer como realizar tarefas diárias conhecidas.</li>
+                        <li>Dificuldade para se orientar em locais familiares.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Confusão com tempo ou lugar:</strong>
+                    <ul>
+                        <li>Perder a noção de datas, estações do ano ou local.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <p class="fonte">
+                Fonte: <a href="https://www.alz.org/alzheimers-dementia/10_signs" target="_blank">Alzheimer’s
+                    Association</a>
+            </p>
+
+            <div class="titulo">
+                <h1>Diagnóstico</h1>
+            </div>
+            <p>Lorem ipsum dolor sit amet...</p>
+
+            <div class="titulo">
+                <h1>Tratamento</h1>
+            </div>
+            <p>Lorem ipsum dolor sit amet...</p>
+
+            <div class="titulo">
+                <h1>Como jogos ajudam no tratamento</h1>
+            </div>
+            <p>Lorem ipsum dolor sit amet...</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-top">
+            <ul>
+                <li>Início</li>
+                <li>Sobre</li>
+                <li>Jogos</li>
+            </ul>
+            <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+            <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            © 2025 Todos os direitos reservados.
+        </div>
+    </footer>
+    <script src="../js/index.js"></script>
+    <script src="../js/atraso.js"></script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="stroop.css">
+  <link rel="icon" type="image/png" href="../../../assets/favicon/cerebro.png">
+  <title>Stroop</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito', sans-serif;
+      background: #f2f2f7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #111827;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 20px;
+    }
+
+    .top-bar button, .top-bar select {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: none;
+      background-color: #137fd9;
+      color: white;
+      cursor: pointer;
+    }
+
+    .top-bar button:hover, .top-bar select:hover {
+      background-color: #0d5fa7;
+    }
+
+    #game-container {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #word {
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+
+    .btn-container button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    #score, #timer {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    #restart {
+      display: none;
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #137fd9;
+      color: white;
+    }
+
+    #restart:hover {
+      background-color: #0d5fa7;
+    }
+
+    #popupInstrucoes {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #popupInstrucoes .conteudo {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      color: #111827;
+    }
+
+    #popupInstrucoes button {
+      background: #137fd9;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      margin-top: 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #popupInstrucoes button:hover {
+      background: #0d5fa7;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #111827;
+        color: #e6edf3;
+      }
+
+      #popupInstrucoes .conteudo {
+        background: #0f1724;
+        color: #e6edf3;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Jogo de Stroop</h1>
+
+  <div class="top-bar">
+    <button id="reiniciar">Reiniciar</button>
+    <select id="dificuldade">
+      <optgroup label="Selecione a dificuldade">
+        <option value="facil">Fácil</option>
+        <option value="medio">Médio</option>
+        <option value="dificil">Difícil</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div id="popupInstrucoes">
+    <div class="conteudo">
+      <h2>Como jogar</h2>
+      <p>Clique no botão que corresponde à <strong>cor do texto</strong> exibido, não ao nome da cor!</p>
+      <p>O tempo do jogo não acaba, ele mede quanto você demora.</p>
+      <button id="fecharPopup">Entendi</button>
+    </div>
+  </div>
+
+  <div id="game-container">
+    <div id="word">Pronto?</div>
+    <div class="btn-container" id="buttons"></div>
+    <div id="score">Pontuação: 0</div>
+    <div id="timer">Tempo: 0s</div>
+    <button id="restart">Jogar Novamente</button>
+  </div>
+
+  <script>
+const cores = ["Vermelho", "Azul", "Verde", "Amarelo"];
+const valores = ["red", "blue", "green", "yellow"];
+const wordEl = document.getElementById("word");
+const buttonsEl = document.getElementById("buttons");
+const scoreEl = document.getElementById("score");
+const timerEl = document.getElementById("timer");
+const restartBtn = document.getElementById("restart");
+const gameContainer = document.getElementById("game-container");
+const popup = document.getElementById("popupInstrucoes");
+const fecharPopupBtn = document.getElementById("fecharPopup");
+const reiniciarBtn = document.getElementById("reiniciar");
+const selectDificuldade = document.getElementById("dificuldade");
+
+let pontuacao = 0;
+let tempo = 0;
+let intervalo = null;
+let dificuldadeAtual = 'facil';
+let corTimeout = null;
+let rodada = 0;
+const totalRodadas = 20;
+
+const duracoes = {
+  facil: 5000,
+  medio: 3000,
+  dificil: 1000
+};
+
+function iniciarJogo() {
+  if (intervalo) clearInterval(intervalo);
+  if (corTimeout) clearTimeout(corTimeout);
+
+  pontuacao = 0;
+  tempo = 0;
+  rodada = 0;
+  scoreEl.textContent = "Pontuação: 0";
+  timerEl.textContent = "Tempo: 0s";
+  restartBtn.style.display = "none";
+  gerarRodada();
+
+  intervalo = setInterval(() => {
+    tempo++;
+    timerEl.textContent = "Tempo: " + tempo + "s";
+  }, 1000);
+}
+
+function gerarRodada() {
+  if (rodada >= totalRodadas) {
+    fimDeJogo();
+    return;
+  }
+
+  rodada++;
+  buttonsEl.innerHTML = "";
+  const indiceTexto = Math.floor(Math.random() * cores.length);
+  const indiceCor = Math.floor(Math.random() * valores.length);
+
+  wordEl.textContent = cores[indiceTexto];
+  wordEl.style.color = valores[indiceCor];
+
+  const respostaCorreta = valores[indiceCor];
+
+  valores.forEach((cor, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = cores[i];
+    btn.style.backgroundColor = cor;
+    btn.addEventListener("click", () => verificarResposta(cor, respostaCorreta));
+    buttonsEl.appendChild(btn);
+  });
+
+  if (corTimeout) clearTimeout(corTimeout);
+  corTimeout = setTimeout(() => {
+    wordEl.textContent = "?";
+    wordEl.style.color = "#000";
+  }, duracoes[dificuldadeAtual]);
+}
+
+function verificarResposta(escolhida, correta) {
+  if (escolhida === correta) pontuacao++;
+  scoreEl.textContent = "Pontuação: " + pontuacao;
+  gerarRodada();
+}
+
+function fimDeJogo() {
+  clearInterval(intervalo);
+  if (corTimeout) clearTimeout(corTimeout);
+  wordEl.textContent = "⏰ Fim de jogo!";
+  wordEl.style.color = "#333";
+  buttonsEl.innerHTML = "";
+  restartBtn.style.display = "inline-block";
+  alert("Você terminou! Tempo total: " + tempo + "s\nPontuação: " + pontuacao + " em " + rodada + " rodadas.");
+}
+
+restartBtn.addEventListener("click", iniciarJogo);
+reiniciarBtn.addEventListener("click", iniciarJogo);
+
+selectDificuldade.addEventListener("change", () => {
+  dificuldadeAtual = selectDificuldade.value;
+  iniciarJogo();
+});
+
+fecharPopupBtn.addEventListener("click", () => {
+  popup.style.display = "none";
+  gameContainer.style.display = "block";
+  iniciarJogo();
+});
+</script>
+
+</body>
+</html>

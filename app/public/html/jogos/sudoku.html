@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../../../assets/favicon/cerebro.png">
+  <link rel="stylesheet" href="./css/sudoku.css">
+  <title>Sudoku</title>
+</head>
+
+<body>
+  <h1>Sudoku</h1>
+  <div class="top-bar">
+
+    <button id="reiniciar">Reiniciar</button>
+    <select id="dificuldade">
+      <optgroup label="Selecione a dificuldade">
+        <option value="easy">Fácil</option>
+        <option value="medium">Médio</option>
+        <option value="hard">Difícil</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <p id="mistakes" class="mistakes"></p>
+
+  <div class="game-container">
+    <div id="grid"></div>
+    <div id="selection"></div>
+  </div>
+
+  <div id="popupInstrucoes">
+    <div class="conteudo">
+      <h2>Como jogar</h2>
+      <p>Complete o tabuleiro de 9x9 com números de 1 a 9, sem repetir em linhas, colunas ou blocos.</p>
+      <button id="fecharPopup">Entendi</button>
+    </div>
+  </div>
+
+  <div id="game-over" style="display:none;">
+    <h2>Fim de Jogo!</h2>
+    <p>Você atingiu o número máximo de erros.</p>
+    <button id="restart">Jogar de Novo</button>
+    <a href="/jogos"><button id="exit">Sair</button></a>
+  </div>
+
+  <script src="./js/sudoku.js"></script>
+</body>
+
+</html>

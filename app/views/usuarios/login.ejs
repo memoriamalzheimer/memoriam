@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/assets/favicon/cerebro.png">
+
+  <title>Login</title>
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="right">
+      <img src="/assets/user.png" alt="Login Image">
+      <h2>ENTRAR</h2>
+
+      <% if (erro) { %>
+        <p class="erro">
+          <%= erro %>
+        </p>
+        <% } %>
+
+          <form action="/login" method="post">
+            <div class="form-group">
+              <input type="email" name="email" placeholder="E-mail" required autocomplete="email">
+              <div id="envelope"></div>
+            </div>
+
+            <div class="form-group">
+              <input type="password" id="senha" name="senha" placeholder="Senha" required
+                autocomplete="current-password">
+              <div id="icon"></div>
+            </div>
+
+            <div class="recuperar">
+              <a href="/recuperar-senha">Esqueceu a senha?</a>
+            </div>
+
+            <div class="form-group termos">
+              <input type="checkbox" name="cuidador" id="cuidador">
+              <span>Entrar como cuidador</span>
+            </div>
+
+            <button type="submit">Entrar</button>
+            <div class="form-group">
+              <a href="/auth/google" class="google-btn">
+                <img src="/assets/google.png" alt="Google">
+                <span>Cadastrar com Google</span>
+              </a>
+            </div>
+
+            <p class="cadastro">Não tem uma conta? <a href="/registro">Cadastre-se</a></p>
+          </form>
+    </div>
+  </div>
+  <script>
+    const email = document.querySelector('input[name="email"]');
+    const iconSenha = document.getElementById('icon');
+    const errosUl = document.querySelector('.erros');
+    const envelope = document.getElementById('envelope');
+
+    function showHide(input, icon) {
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.add('hide');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('hide');
+      }
+    }
+    if (iconSenha) {
+      iconSenha.addEventListener('click', function () {
+        showHide(senha, iconSenha);
+      });
+    }
+
+
+    document.addEventListener("keypress", function (e) {
+      if (e.key === 'Enter') {
+
+        var btn = document.querySelector("#submit");
+
+        btn.click();
+
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/assets/favicon/cerebro.png">
+  <title>Redefinir Senha</title>
+  <link rel="stylesheet" href="/css/redefinir-senha.css">
+</head>
+
+<body>
+
+  <form action="/redefinir-senha/<%= token %>" method="POST">
+    <h1>Redefinir Senha</h1>
+    <span>Por favor, digite uma nova senha</span>
+
+    <div style="position: relative; width: 100%;">
+      <input type="password" id="senha" name="senha" placeholder="Nova senha" required>
+      <div id="icon"></div>
+    </div>
+
+    <div style="position: relative; width: 100%;">
+      <input type="password" id="senhaConfirmacao" name="senhaConfirmacao" placeholder="Confirme a nova senha" required>
+      <div id="iconConfirmacao"></div>
+    </div>
+
+    <button type="submit">Salvar nova senha</button>
+    <span id="link">Lembrou sua senha? <a href="/login">Login</a></span>
+
+    <% if (mensagem) { %>
+      <p id="nada"><%= mensagem %></p>
+    <% } %>
+  </form>
+
+  <script>
+    const senha = document.getElementById('senha');
+    const senhaConfirmacao = document.getElementById('senhaConfirmacao');
+    const iconSenha = document.getElementById('icon');
+    const iconConfirmacao = document.getElementById('iconConfirmacao');
+
+    function showHide(input, icon) {
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.add('hide');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('hide');
+      }
+    }
+
+    if (iconSenha) iconSenha.addEventListener('click', () => showHide(senha, iconSenha));
+    if (iconConfirmacao) iconConfirmacao.addEventListener('click', () => showHide(senhaConfirmacao, iconConfirmacao));
+  </script>
+
+</body>
+
+</html>

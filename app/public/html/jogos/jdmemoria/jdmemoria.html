@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Jogo da Memória</title>
+    <link rel="stylesheet" type="text/css" href="jdmemoria.css">
+    <link rel="icon" type="image/png" href="../../../assets/favicon/cerebro.png">
+</head>
+<body>
+    <header>
+        <h1>Jogo da Memória</h1>
+        <div class="controls">
+            <button id="htpb">Como jogar</button>
+        </div>
+    </header>
+    <br/>
+    <div class="game-area">
+        <div class="grid-container"></div>
+        <div class="info">
+            <div class="score-actions">
+                <p class="Bp">Pontuação: <span class="score"></span></p>
+                <div class="actions">
+                    <button onclick="restartGame()">Reiniciar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="popv-vitoria" class="popv">
+        <div class="popv-conteudo">
+            <h3>Parabéns! Você encontrou todos os pares!</h3>
+            <div class="botoes">
+                <a href="/jogos" class="btn">Voltar</a>
+                <button id="btn-reiniciar" class="btn">Jogar Novamente</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="comoj" style="display:none">
+        <div class="conteudo">
+            <h2>Como jogar</h2>
+            <p>Clique em uma carta na tela para virá-la e, depois, escolha outra para tentar formar um par. Se as cartas forem iguais, elas permanecem viradas e contabilizam um ponto para você; caso contrário, as duas cartas que não coincidirem serão viradas novamente. Encontre todos os pares para vencer o jogo.</p>
+            <button id="fecharComoj">Entendi</button>
+        </div>
+    </div>
+    <script src="jdmemoria.js"></script>
+</body>
+</html>

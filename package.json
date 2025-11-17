@@ -1,0 +1,42 @@
+{
+  "name": "tcc2",
+  "version": "1.0.0",
+  "description": "Site da Empresa",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Empresa",
+    "Login",
+    "Cadastro",
+    "Consulta",
+    "Alteração",
+    "Exclusão"
+  ],
+  "author": "Isidoro",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-load": "^1.1.16",
+    "express-session": "^1.18.2",
+    "express-validator": "^2.20.8",
+    "fs": "^0.0.1-security",
+    "google-auth-library": "^10.4.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1",
+    "nodemailer": "^7.0.10",
+    "nodemailer-express-handlebars": "^7.0.0",
+    "nodemon": "^3.1.9",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "path": "^0.12.7",
+    "socket.io": "^4.8.1"
+  }
+}

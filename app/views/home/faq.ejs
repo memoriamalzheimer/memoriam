@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/assets/favicon/cerebro.png">
+    <link rel="stylesheet" href="../css/faq.css">
+    <link rel="stylesheet" href="../css/configgerais.css">
+    <title>Memoriam: FAQ</title>
+</head>
+
+<body>
+    <header>
+        <nav class="itens">
+            <ul>
+                <li class="logo">
+                    <img src="../../assets/logo.png" alt="logo" draggable="false">
+                    <h2>Memoriam</h2>
+                    <span class="social">
+                        <img src="../../assets/instagram.svg" draggable="false" alt="Instagram">
+                        <img src="../../assets/facebook.svg" draggable="false" alt="Facebook">
+                        <img src="../../assets/twitter.svg" draggable="false" alt="Twitter">
+                    </span>
+                </li>
+                <li><a href="<%= usuario ? '/inicio' : '/' %>">Início</a></li>
+                <li><a href="/sobre">Sobre</a></li>
+                <li><a href="/jogos">Jogos</a></li>
+                <li><a href="#" class="ativo">Perguntas Frequentes</a></li>
+                <li><a href="/convite">Convites</a></li>
+
+                <li class="dropdown-login">
+                    <% if (usuario) { %>
+                        <a href="/logout">Sair</a>
+                    <% } else { %>
+                        <span class="dropdown-toggle">Login ▼</span>
+                        <div class="dropdown-content-login">
+                            <a href="/login">Entrar</a>
+                            <a href="/registro">Registrar</a>
+                        </div>
+                    <% } %>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="faq-container">
+        <h1>Perguntas Frequentes</h1>
+
+        <div class="faq-item">
+            <h2 onclick="toggleAnswer(this)">Como funciona a plataforma?</h2>
+            <p class="answer">A plataforma Memoriam oferece atividades e jogos para estimular funções cognitivas de
+                idosos, especialmente no contexto do Alzheimer.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleAnswer(this)">Meus dados são armazenados online?</h2>
+            <p class="answer">Não. Os dados ficam armazenados localmente no navegador do usuário, garantindo
+                privacidade.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleAnswer(this)">É necessário criar uma conta?</h2>
+            <p class="answer">Não é necessário. Você pode usar a plataforma livremente sem criar uma conta.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleAnswer(this)">Como posso resetar os dados?</h2>
+            <p class="answer">Na página de acompanhamento, há um botão "Resetar" que apaga todos os dados salvos
+                localmente.</p>
+        </div>
+
+        <section class="faq-form">
+            <h2>Não encontrou sua dúvida?</h2>
+            <form id="faq-form">
+                 <% if (usuario) { %>
+                    <input type="hidden" name="email" value="<%= usuario.email %>">
+                <% } %>
+
+                <label for="pergunta">Envie sua pergunta:</label>
+                <textarea name="pergunta" id="pergunta" rows="4" required></textarea>
+                <button type="submit" id="submit">Enviar</button>
+            </form>
+        </section>
+    </main>
+    
+
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+        emailjs.init("e0yS1nwLBaxrzQdjq");
+
+        document.getElementById('faq-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            emailjs.sendForm('service_memoriam', 'template_5hn6gdh', this)
+                .then(() => {
+                    alert('Pergunta enviada com sucesso!');
+                 })
+                .catch(err => {
+                    alert('Erro ao enviar: ' + JSON.stringify(err));
+                });
+        });
+
+        function toggleAnswer(el) {
+            const answer = el.nextElementSibling;
+            if (answer.classList.contains("open")) {
+                answer.classList.remove("open");
+                answer.classList.add("closing");
+                setTimeout(() => { answer.classList.remove("closing"); }, 280);
+            } else {
+                answer.classList.add("open");
+            }
+        }
+
+        window.onload = function () {
+            document.querySelectorAll('.answer').forEach(p => p.classList.remove('open'));
+        };
+
+        document.addEventListener("keypress", function (e) {
+            if (e.key === 'Enter') {
+                var btn = document.querySelector("#submit");
+                btn.click();
+            }
+        });
+    </script>
+
+    <footer>
+        <div class="footer-top">
+            <ul>
+                <li>Início</li>
+                <li>Sobre</li>
+                <li>Jogos</li>
+            </ul>
+            <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+            <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            © 2025 Todos os direitos reservados.
+        </div>
+    </footer>
+    <script src="../../js/atraso.js"></script>
+</body>
+
+</html>

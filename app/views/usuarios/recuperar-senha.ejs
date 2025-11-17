@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/assets/favicon/cerebro.png">
+  <title>Recuperar Senha</title>
+  <link rel="stylesheet" href="/css/recuperar-senha.css">
+</head>
+
+<body>
+ 
+  <form action="/recuperar-senha" method="POST">
+     <h1>Recuperar Senha</h1>
+  <span>Por favor, coloque seu endereço de e-mail para receber um link de recuperação.</span>
+
+    <input type="email" name="email" placeholder="Digite seu e-mail" required>
+    <button type="submit">Enviar</button>
+    <span id="link">Lembrou sua senha? <a href="/login">Login</a></span>
+    
+  <% if (mensagem) { %>
+    <p id="nada"><%= mensagem %></p>
+  <% } %>
+  </form>
+
+</body>
+
+</html>

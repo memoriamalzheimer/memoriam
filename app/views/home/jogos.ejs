@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/favicon/cerebro.png">
+    <link rel="stylesheet" href="../css/jogos.css">
+    <link rel="stylesheet" href="../css/configgerais.css">
+    <title>Memoriam: Jogos</title>
+</head>
+
+<body>
+    <header>
+        <nav class="itens">
+            <ul>
+                <li class="logo">
+                    <img src="../assets/logo.png" alt="logo" draggable="false">
+                    <h2>Memoriam</h2>
+                    <span class="social">
+                        <img class="instagram" src="../assets/instagram.svg" draggable="false" alt="Instagram">
+                        <img class="facebook" src="../assets/facebook.svg" draggable="false" alt="Facebook">
+                        <img class="twitter" src="../assets/twitter.svg" draggable="false" alt="Twitter">
+                    </span>
+                </li>
+                <li><a href="<%= usuario ? '/inicio' : '/' %>">Início</a></li>
+                <li><a href="/sobre">Sobre</a></li>
+                <li><a href="#" class="ativo">Jogos</a></li>
+                <li><a href="/faq">Perguntas Frequentes</a></li>
+                <li><a href="/convite">Convites</a></li>
+                <li class="dropdown-login">
+                    <% if (usuario) { %>
+                        <a href="/logout">Sair</a>
+                        <% } else { %>
+                            <span class="dropdown-toggle">Login ▼</span>
+                            <div class="dropdown-content-login">
+                                <a href="/login">Entrar</a>
+                                <a href="/registro">Registrar</a>
+                            </div>
+                            <% } %>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Jogos</h1>
+        <div class="grade-jogos">
+            <div class="grade1">
+                <a class="card" href="../html/jogos/chess/chess.html">
+                    <img src="../html/assets/xadrez.svg " alt="Xadrez" loading="lazy">
+                    <span>Xadrez</span>
+                </a>
+                <a class="card" href="/dama">
+                    <img src="../html/assets/dama.svg" alt="Damas" loading="lazy">
+                    <span>Damas</span>
+                </a>
+
+                <a class="card" href="../html/jogos/sudoku.html?instrucoes=true">
+                    <img src="../html/assets/sudoku.png" alt="Sudoku" loading="lazy">
+                    <span>Sudoku</span>
+                </a>
+            </div>
+            <div class="grade2">
+                <a class="card" href="../html/jogos/quebra/quebra.html" loading="lazy">
+                    <img src="../html/assets/quebra.svg" alt="Quebra-Cabeça">
+                    <span>Quebra-Cabeça</span>
+                </a>
+
+                <a class="card" href="../html/jogos/jdmemoria/jdmemoria.html" loading="lazy">
+                    <img src="../html/assets/memoria.svg" alt="Jogo da Memória">
+                    <span>Jogo da Memória</span>
+                </a>
+
+                <a class="card" href="../html/jogos/stroop/stroop.html" loading="lazy">
+                    <img src="../html/assets/stroop.png" alt="Desafio Stroop">
+                    <span>Desafio Stroop</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-top">
+            <ul>
+                <li>Início</li>
+                <li>Sobre</li>
+                <li>Jogos</li>
+            </ul>
+            <ul>
+                <li>Perguntas Frequentes</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+            <ul>
+                <li>Recursos</li>
+                <li>Contato</li>
+                <li>Ajuda</li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            © 2025 Todos os direitos reservados.
+        </div>
+    </footer>
+    <script src="../../js/atraso.js"></script>
+</body>
+
+</html>

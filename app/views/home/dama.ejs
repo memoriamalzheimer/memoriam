@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/png" href="../assets/favicon/cerebro.png">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../css/dama.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <title>Jogo de Dama</title>
+  <style>
+   
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Jogo de Dama</h1>
+      <div class="controls">
+        <label for="idOponente">Convidar ID:</label>
+        <input id="idOponente" type="text" placeholder="ID do jogador">
+        <button id="btnConvidar">Convidar</button>
+        <button id="reiniciar">Reiniciar</button>
+        <button id="instrucoesBtn">Como jogar</button>
+      </div>
+    </header>
+
+    <div class="game-area">
+      <div id="board" class="board"></div>
+      <div class="info">
+        <p><strong>Vez:</strong> <span id="turnLabel">Vermelho</span></p>
+        <p><strong>Capturas:</strong> Vermelho: <span id="scoreRed">0</span> — Branco: <span id="scoreWhite">0</span>
+        </p>
+        <p><strong>Seu lado:</strong> <span id="ladoLabel">—</span></p>
+        <button id="undo" disabled>Desfazer</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="popupInstrucoes">
+    <div class="conteudo">
+      <h2>Como jogar</h2>
+      <p>Clique em uma peça sua para selecionar, depois clique na casa de destino. As peças se movem diagonalmente e
+        capturam pulando. Ao chegar na última fileira, viram dama e podem andar para trás.</p>
+      <button id="fecharPopup">Entendi</button>
+    </div>
+  </div>
+
+  <div id="convitePop">
+    <p id="msgConvite"></p>
+    <button id="aceitarConviteBtn">Aceitar</button>
+    <button id="fecharConviteBtn">Fechar</button>
+  </div>
+
+  <div id="statusBar">Conectando...</div>
+
+  <div id="chat">
+    <div id="chatMensagens"></div>
+    <div id="chatInput">
+      <input id="mensagemInput" placeholder="Digite uma mensagem..." />
+      <button id="btnEnviarMensagem">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+
+     document.getElementById("mensagemInput").addEventListener("keyup", function(e){
+      if (e.key === "Enter"){
+        document.getElementById('btnEnviarMensagem').click();
+      }
+    });
+     document.getElementById("idOponente").addEventListener("keyup", function(e){
+      if (e.key === "Enter"){
+        document.getElementById('btnConvidar').click();
+      }
+    });
+
+
+    const socket = io();
+    const meuId = 'user-' + Math.floor(Math.random() * 999999);
+    const salaQuery = new URL(window.location.href).searchParams.get("sala");
+    const ladoQuery = new URL(window.location.href).searchParams.get("lado") || null;
+    let meuLado = ladoQuery;
+    let boardElement, turn = "red", selectedPiece = null, possibleMoves = [], moveHistory = [], score = { red: 0, white: 0 };
+    const statusBar = document.getElementById('statusBar');
+    const ladoLabel = document.getElementById('ladoLabel');
+    const chatMensagens = document.getElementById('chatMensagens');
+    const mensagemInput = document.getElementById('mensagemInput');
+
+    socket.on('connect', () => {
+      statusBar.textContent = 'Conectado (' + meuId + ')';
+      socket.emit('registrarId', meuId);
+      if (salaQuery) socket.emit('entrarSala', { sala: salaQuery });
+    });
+
+    socket.on('disconnect', () => statusBar.textContent = 'Desconectado');
+    socket.on('erroConvite', ({ msg }) => alert(msg));
+    socket.on('onlineUsers', lista => console.log('Online:', lista));
+    socket.on('receber', ({ de, mensagem, privada }) => {
+      const el = document.createElement('div');
+      el.innerHTML = `<strong>${de}${privada ? ' (privada)' : ''}:</strong> ${mensagem}`;
+      chatMensagens.appendChild(el);
+      chatMensagens.scrollTop = chatMensagens.scrollHeight;
+    });
+
+    document.getElementById('btnEnviarMensagem').onclick = () => {
+      const texto = mensagemInput.value.trim();
+      if (!texto) return;
+      socket.emit('enviar', { sala: salaQuery, mensagem: texto });
+      mensagemInput.value = '';
+    };
+
+    document.getElementById('btnConvidar').onclick = () => {
+      const para = document.getElementById('idOponente').value.trim();
+      if (!para) return alert('Digite o ID do oponente.');
+      if (para === meuId) return alert('Você não pode convidar você mesmo.');
+      socket.emit('enviarConvite', { de: meuId, para });
+    };
+
+    socket.on('conviteEnviado', ({ para }) => alert('Convite enviado para ' + para));
+    socket.on('conviteRecebido', ({ de }) => {
+      document.getElementById('msgConvite').innerHTML = `Jogador <strong>${de}</strong> te convidou para jogar.`;
+      const pop = document.getElementById('convitePop');
+      pop.style.display = 'flex';
+      document.getElementById('aceitarConviteBtn').onclick = () => { socket.emit('aceitarConvite', { de, para: meuId }); pop.style.display = 'none'; };
+      document.getElementById('fecharConviteBtn').onclick = () => pop.style.display = 'none';
+    });
+
+    socket.on('conviteAceito', ({ sala, lado }) => {
+      window.location.href = window.location.pathname + '?sala=' + encodeURIComponent(sala) + '&lado=' + lado;
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      boardElement = document.getElementById('board');
+      criarTabuleiro();
+      atualizarStatus();
+      document.getElementById('reiniciar').onclick = reiniciar;
+      document.getElementById('undo').onclick = desfazer;
+      document.getElementById('instrucoesBtn').onclick = () => document.getElementById('popupInstrucoes').style.display = 'flex';
+      document.getElementById('fecharPopup').onclick = () => document.getElementById('popupInstrucoes').style.display = 'none';
+      if (meuLado) ladoLabel.textContent = meuLado === 'red' ? 'Vermelho' : 'Branco';
+      socket.on('movimento', executarMovimentoDoOutro);
+      
+    });
+
+   
+
+    function criarTabuleiro() {
+      boardElement.innerHTML = '';
+      for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.dataset.color = (r + c) % 2 === 0 ? 'light' : 'dark';
+        if (cell.dataset.color === 'dark') cell.onclick = () => clicarCelula(cell);
+        boardElement.appendChild(cell);
+      }
+      posicionarPecas();
+    }
+
+    function posicionarPecas() {
+      document.querySelectorAll('.cell').forEach(c => c.innerHTML = '');
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 8; c++) if ((r + c) % 2 === 1) addPiece(getCell(r, c), 'white');
+      for (let r = 5; r < 8; r++) for (let c = 0; c < 8; c++) if ((r + c) % 2 === 1) addPiece(getCell(r, c), 'red');
+    }
+
+    function addPiece(cell, color, isKing = false) {
+      const p = document.createElement('div');
+      p.className = 'piece ' + color + (isKing ? ' king' : '');
+      p.onclick = e => { e.stopPropagation(); selecionarPeca(p); };
+      cell.appendChild(p);
+    }
+
+    function pecasComCaptura(lado) {
+      let capturas = [];
+      document.querySelectorAll('.piece.' + lado).forEach(p => {
+        const moves = calcularMovimentos(p, true);
+        if (moves.length > 0) capturas.push({ p, moves });
+      });
+      return capturas;
+    }
+
+    function selecionarPeca(p) {
+      limparHighlights();
+      if (meuLado) { if (!p.classList.contains(meuLado) || turn !== meuLado) return; }
+      else if (!p.classList.contains(turn)) return;
+      const obrigatorias = pecasComCaptura(turn);
+      const moves = calcularMovimentos(p, true);
+      if (obrigatorias.length > 0 && moves.length === 0) return;
+      selectedPiece = p;
+      mostrarMovimentos(p);
+    }
+
+    function calcularMovimentos(p, apenasCaptura = false) {
+      const cell = p.parentElement;
+      const row = parseInt(cell.dataset.row), col = parseInt(cell.dataset.col);
+      const color = p.classList.contains('red') ? 'red' : 'white';
+      const isKing = p.classList.contains('king');
+      let moves = [];
+      const dirs = [];
+      if (color === 'red' || isKing) dirs.push([-1, -1], [-1, 1]);
+      if (color === 'white' || isKing) dirs.push([1, -1], [1, 1]);
+      dirs.forEach(([dr, dc]) => {
+        const r2 = row + dr, c2 = col + dc, cell2 = getCell(r2, c2);
+        if (!cell2) return;
+        if (cell2.children.length === 0 && !apenasCaptura) moves.push({ row: r2, col: c2, capture: null });
+        else {
+          const other = cell2.children[0];
+          if (other && !other.classList.contains(color)) {
+            const r3 = row + dr * 2, c3 = col + dc * 2, cell3 = getCell(r3, c3);
+            if (cell3 && cell3.children.length === 0) moves.push({ row: r3, col: c3, capture: cell2 });
+          }
+        }
+      });
+      return moves;
+    }
+
+    function mostrarMovimentos(p) { possibleMoves = calcularMovimentos(p, false); const obrigatorias = pecasComCaptura(turn); if (obrigatorias.length > 0) possibleMoves = possibleMoves.filter(m => m.capture); highlightMoves(); }
+    function highlightMoves() { possibleMoves.forEach(m => { const c = getCell(m.row, m.col); if (c) c.classList.add(m.capture ? 'capture' : 'highlight'); }); }
+    function limparHighlights() { document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight', 'capture')); possibleMoves = []; selectedPiece = null; }
+    function clicarCelula(cell) { if (!selectedPiece) return; if (meuLado && turn !== meuLado) return; if (meuLado && !selectedPiece.classList.contains(meuLado)) return; const r = parseInt(cell.dataset.row), c = parseInt(cell.dataset.col); const dest = possibleMoves.find(m => m.row === r && m.col === c); if (dest) moverPeca(selectedPiece, cell, dest.capture); }
+    function moverPeca(p, destino, captureCell) { const origem = p.parentElement; destino.appendChild(p); if (captureCell) { const cap = captureCell.children[0]; if (cap) { const cor = cap.classList.contains('red') ? 'red' : 'white'; captureCell.innerHTML = ''; score[cor]++; } } promover(p, destino); moveHistory.push({ p, origem, destino, captureCell }); document.getElementById('undo').disabled = false; limparHighlights(); trocarTurno(); const mov = { origem: getCellIndex(origem), destino: getCellIndex(destino), capturada: captureCell ? getCellIndex(captureCell) : null, king: p.classList.contains('king'), nextTurn: turn }; enviarMovimentoSocket(mov); }
+    function promover(p, d) { const r = parseInt(d.dataset.row); if (p.classList.contains('red') && r === 0) p.classList.add('king'); if (p.classList.contains('white') && r === 7) p.classList.add('king'); }
+    function trocarTurno() { turn = (turn === 'red') ? 'white' : 'red'; atualizarStatus(); }
+    function atualizarStatus() { document.getElementById('turnLabel').textContent = turn === 'red' ? 'Vermelho' : 'Branco'; document.getElementById('scoreRed').textContent = score.red; document.getElementById('scoreWhite').textContent = score.white; }
+    function desfazer() { const last = moveHistory.pop(); if (!last) return; last.origem.appendChild(last.p); if (last.captureCell) { const pc = document.createElement('div'); const cor = (last.p && last.p.classList.contains('red')) ? 'white' : ((last.p && last.p.classList.contains('white')) ? 'red' : 'white'); pc.className = 'piece ' + cor; last.captureCell.appendChild(pc); score[cor]--; } if (moveHistory.length === 0) document.getElementById('undo').disabled = true; trocarTurno(); }
+    function getCell(r, c) { return document.querySelector('.cell[data-row="' + r + '"][data-col="' + c + '"]'); }
+    function getCellIndex(cell) { return { row: parseInt(cell.dataset.row), col: parseInt(cell.dataset.col) }; }
+    function executarMovimentoDoOutro(m) { const o = getCell(m.origem.row, m.origem.col); const d = getCell(m.destino.row, m.destino.col); if (!o || !d) return; const p = o.children[0]; if (!p) return; d.appendChild(p); if (m.capturada) { const c = getCell(m.capturada.row, m.capturada.col); if (c && c.children[0]) { const cor = c.children[0].classList.contains('red') ? 'red' : 'white'; c.innerHTML = ''; score[cor]++; } } if (m.king) p.classList.add('king'); turn = m.nextTurn || ((turn === 'red') ? 'white' : 'red'); atualizarStatus(); limparHighlights(); }
+    function enviarMovimentoSocket(mov) { const sala = salaQuery; if (!sala) return; socket.emit('movimento', { sala, movimento: mov }); }
+    function reiniciar() { posicionarPecas(); score = { red: 0, white: 0 }; moveHistory = []; turn = 'red'; atualizarStatus(); document.getElementById('undo').disabled = true; limparHighlights(); }
+
+    
+  </script>
+   
+</body>
+
+</html>
