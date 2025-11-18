@@ -241,8 +241,7 @@
         listaEl.appendChild(item);
       });
 
-      // Recebe convite de vídeo
-      socket.on('conviteVideoRecebido', ({ de }) => {
+       socket.on('conviteVideoRecebido', ({ de }) => {
         const item = document.createElement('div');
         item.style.marginBottom = '8px';
         item.style.display = 'flex';
@@ -294,20 +293,17 @@
         setTimeout(() => statusEl.textContent = 'Conectado ao servidor.', 3000);
       });
 
-      // quando aceitar convite de jogo (mantém comportamento antigo)
-      socket.on('conviteAceito', ({ sala }) => {
+       socket.on('conviteAceito', ({ sala }) => {
         statusEl.textContent = 'Convite aceito — abrindo sala...';
         window.location.href = '/dama?sala=' + encodeURIComponent(sala);
       });
 
-      // quando aceitar convite de vídeo, servidor responde com sala
-      socket.on('conviteVideoAceito', ({ sala }) => {
+       socket.on('conviteVideoAceito', ({ sala }) => {
         statusEl.textContent = 'Convite aceito — abrindo sala de vídeo...';
         window.location.href = '/videochamada?sala=' + encodeURIComponent(sala);
       });
 
-      // funções públicas para serem chamadas por outras páginas (p.ex. dama)
-      window.enviarConvitePorId = function (destinoId) {
+       window.enviarConvitePorId = function (destinoId) {
         socket.emit('enviarConvite', { de: meuId, para: destinoId });
       };
 
@@ -315,8 +311,7 @@
         socket.emit('enviarConviteVideo', { de: meuId, para: destinoId });
       };
 
-      // helpers para os inputs locais
-      window.enviarConviteFromInput = function () {
+       window.enviarConviteFromInput = function () {
         const id = document.getElementById('inputConviteId').value.trim();
         if (!id) return alert('Digite um ID');
         window.enviarConvitePorId(id);
