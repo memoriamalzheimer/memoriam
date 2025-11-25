@@ -15,6 +15,195 @@ body {
   padding: 20px;
 }
 
+#popupInicio {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+#popupInicio .conteudo {
+  background: #e6edf3;
+  border-radius: 15px;
+  padding: 25px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: #111827;
+}
+
+#popupInicio h2,
+#popupInicio p {
+  margin-top: 15px;
+  color: inherit;
+}
+
+#popupInicio button {
+  background: #137fd9;
+  color: #e6edf3;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#popupInicio button:hover {
+  background: #0d5fa7;
+}
+
+#popupInstrucoes {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+#popupInstrucoes .conteudo {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 25px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: #111827;
+}
+
+#popupInstrucoes h2,
+#popupInstrucoes p {
+  margin-top: 15px;
+  color: inherit;
+}
+
+#popupInstrucoes button {
+  background: #137fd9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#convitePop {
+  position: fixed;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 24, 39, 0.4);
+  z-index: 10;
+  background: #e5e7eb;
+  padding: 18px;
+  border-radius: 10px;
+  max-width: 640px;
+  text-align: center;
+  flex-direction: column;
+}
+
+#convitePop p {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#convitePop button {
+  margin: 5px;
+  background: #137fd9;
+  color: #e6edf3;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+#convitePop button:hover {
+  background-color: #0d5fa7;
+  transform: scale(1.05);
+}
+
+#popupVencedor {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+#popupVencedor .conteudo {
+  background: #e6edf3;
+  border-radius: 15px;
+  padding: 25px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: #111827;
+}
+
+#popupVencedor h2,
+#popupVencedor p {
+  margin-top: 15px;
+  color: inherit;
+}
+
+#popupVencedor button {
+  background: #137fd9;
+  color: #e6edf3;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  transform: scale(1.05);
+  opacity: 1;
+  background-color: #2b91eb;
+  color: #e6edf3;
+}
+
+@media (prefers-color-scheme: dark) {
+  #popupInicio .conteudo,
+  #popupInstrucoes .conteudo,
+  #convitePop,
+  #popupVencedor .conteudo {
+    background: #0f1724;
+    color: #e6edf3;
+  }
+
+  #popupInicio h2,
+  #popupInicio p,
+  #popupInstrucoes h2,
+  #popupInstrucoes p,
+  #popupVencedor h2,
+  #popupVencedor p {
+    color: #e6edf3;
+  }
+}
+
+/* restante do seu CSS original continua daqui para baixo */
+
 .container {
   display: flex;
   flex-direction: column;
@@ -152,25 +341,6 @@ input {
   margin-top: 12px;
 }
 
-#popupInstrucoes,
-#convitePop {
-  position: fixed;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(17, 24, 39, 0.4);
-  z-index: 10;
-}
-
-#popupInstrucoes .conteudo,
-#convitePop {
-  background: #e5e7eb;
-  padding: 18px;
-  border-radius: 10px;
-  max-width: 640px;
-  text-align: center;
-}
-
 #statusBar {
   position: fixed;
   bottom: 12px;
@@ -232,9 +402,12 @@ input {
     border: 4px solid #0b1220;
   }
 
-  .status,
-  #popupInstrucoes .conteudo,
   #convitePop {
+    background: #0f1724;
+    color: #e6edf3;
+  }
+
+  .status {
     background: #0f1724;
     color: #e6edf3;
   }

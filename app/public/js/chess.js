@@ -1,27 +1,20 @@
 // Inserting the Images
-function insertImage() {
-
-    document.querySelectorAll('.box').forEach(image => {
-
-        if (image.innerText.length !== 0) {
-            if (image.innerText == 'Wpawn' || image.innerText == 'Bpawn') {
-                image.innerHTML = `${image.innerText} <img class='allimg allpawn' src="${image.innerText}.png" alt="">`
-                image.style.cursor = 'pointer'
-
+ function insertImage() {
+    document.querySelectorAll('.box').forEach(box => {
+        if (box.innerText.length !== 0) {
+            const piece = box.innerText;
+            const imgPath = `js/assets/${piece}.png`;  
+            if (piece == 'Wpawn' || piece == 'Bpawn') {
+                box.innerHTML = `${piece} <img class='allimg allpawn' src="${imgPath}" alt="${piece}">`;
+            } else {
+                box.innerHTML = `${piece} <img class='allimg' src="${imgPath}" alt="${piece}">`;
             }
-
-            else {
-
-                image.innerHTML = `${image.innerText} <img class='allimg' src="${image.innerText}.png" alt="">`
-                image.style.cursor = 'pointer'
-            }
+            box.style.cursor = 'pointer';
         }
-    })
+    });
 }
-insertImage()
 
-
-//Coloring
+insertImage();
 
 function coloring() {
     const color = document.querySelectorAll('.box')
@@ -707,3 +700,10 @@ document.querySelectorAll('.box').forEach(ee => {
         }
     })
 })
+window.onload = () => {
+        document.getElementById("popupInicio").style.display = "flex";
+    };
+
+     document.getElementById("fecharPopupInicio").onclick = () => {
+        document.getElementById("popupInicio").style.display = "none";
+    };

@@ -1,7 +1,8 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  font-family: Inter, system-ui, Segoe UI, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
@@ -11,7 +12,69 @@ body {
     background-color: #f3f4f6;
     color: #111827;
 }
+button,
+select,
+input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 0;
+  background: #d1d5db;
+  color: #111827;
+  cursor: pointer;
+}
+#popupInicio {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.6);
+justify-content: center;
+align-items: center;
+z-index: 2000;
+}
 
+#popupInicio .conteudo {
+background: white;
+border-radius: 15px;
+padding: 25px;
+max-width: 400px;
+text-align: center;
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+color: #111827;
+}
+
+#popupInicio h2,
+#popupInicio p {
+color: inherit;
+}
+
+#popupInicio button {
+background: #137fd9;
+color: white;
+border: none;
+border-radius: 8px;
+padding: 10px 20px;
+margin-top: 15px;
+cursor: pointer;
+font-weight: bold;
+}
+
+#popupInicio button:hover {
+background: #0d5fa7;
+}
+
+@media (prefers-color-scheme: dark) {
+#popupInicio .conteudo {
+background: #0f1724;
+color: #e6edf3;
+}
+#popupInicio h2,
+#popupInicio p {
+color: #e6edf3;
+}
+}
 h1 {
     margin: 10px;
 }
@@ -111,7 +174,7 @@ li {
     }
 
     h1 {
-        color: #93c5fd;
+        color: #e6edf3;
     }
 
     .box {
@@ -122,4 +185,10 @@ li {
     .author {
         color: #e6edf3;
     }
+    button,
+  select,
+  input {
+    background: #1f2937;
+    color: #e6edf3;
+  }
 }

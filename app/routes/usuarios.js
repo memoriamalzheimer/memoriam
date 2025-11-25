@@ -7,79 +7,78 @@ require('dotenv').config();
 
 module.exports = function(app) {
 
-     function verificarLogin(req, res, next) {
+    function verificarLogin(req, res, next) {
         if (!req.session.usuario) {
-            return res.redirect('/');
+            return res.render('usuarios/login.ejs', { 
+                erro: 'Você precisa fazer login para acessar esta página.' 
+            });
         }
         next();
     }
 
-     app.get('/', function(req, res) {
+    app.get('/', function(req, res) {
         if (req.session.usuario) return res.redirect('/inicio');
         res.render('index.ejs');
     });
 
-     app.get('/login', function(req, res) {
+    app.get('/login', function(req, res) {
         res.render('usuarios/login.ejs', { erro: null });
     });
 
-  app.post('/login', function(req, res) {
-    const connection = app.infra.connectionFactory();
-    const usuariosDAO = new app.infra.UsuariosDAO(connection);
-    const { email, senha, cuidador } = req.body;   
+    app.post('/login', function(req, res) {
+        const connection = app.infra.connectionFactory();
+        const usuariosDAO = new app.infra.UsuariosDAO(connection);
+        const { email, senha, cuidador } = req.body;   
 
-    usuariosDAO.buscarPorEmail(email, function(err, results) {
-        if (err) {
-            connection.end();
-            return res.send('Erro ao buscar usuário!');
-        }
-
-        if (results.length === 0) {
-            connection.end();
-            return res.render('usuarios/login.ejs', { erro: 'Usuário não encontrado!' });
-        }
-
-        const usuario = results[0];
-
-        bcrypt.compare(senha, usuario.senha, function(err, result) {
-            connection.end();
-            if (!result) {
-                return res.render('usuarios/login.ejs', { erro: 'Usuário ou senha inválidos!' });
+        usuariosDAO.buscarPorEmail(email, function(err, results) {
+            if (err) {
+                connection.end();
+                return res.send('Erro ao buscar usuário!');
             }
 
-             req.session.usuario = usuario;
-            
-            req.session.save(() => {  
-                 if (cuidador) {
-                    return res.redirect('/cuidador');
-                } else {
-                    return res.redirect('/inicio');
+            if (results.length === 0) {
+                connection.end();
+                return res.render('usuarios/login.ejs', { erro: 'Usuário não encontrado!' });
+            }
+
+            const usuario = results[0];
+
+            bcrypt.compare(senha, usuario.senha, function(err, result) {
+                connection.end();
+                if (!result) {
+                    return res.render('usuarios/login.ejs', { erro: 'Usuário ou senha inválidos!' });
                 }
+
+                req.session.usuario = usuario;
+
+                req.session.save(() => {  
+                    if (cuidador) {
+                        return res.redirect('/cuidador');
+                    } else {
+                        return res.redirect('/inicio');
+                    }
+                });
             });
         });
     });
-});
 
     app.get('/cuidador', verificarLogin, function(req, res) {
         res.render('usuarios/cuidador.ejs', { usuario: req.session.usuario });
     });
 
-     
-  app.get('/videochamada', (req, res) => {
-    if (!req.session.usuario) {
-      return res.redirect('/login');
-    }
-    res.render('home/videochamada', { usuario: req.session.usuario });
-  });
+    app.get('/videochamada', (req, res) => {
+        if (!req.session.usuario) {
+            return res.redirect('/login');
+        }
+        res.render('home/videochamada', { usuario: req.session.usuario });
+    });
 
-
-     app.get('/logout', function(req, res) {
+    app.get('/logout', function(req, res) {
         req.session.destroy(() => {
             res.redirect('/');
         });
     });
 
-      
     app.get('/registro', function(req, res) {
         res.render('usuarios/registro.ejs', { errosValidacao: [], usuario: {} });
     });
@@ -143,25 +142,15 @@ module.exports = function(app) {
         });
     });
 
-     app.get('/inicio', verificarLogin, function(req, res) {
+    app.get('/inicio', verificarLogin, function(req, res) {
         res.render('home/inicio.ejs', { usuario: req.session.usuario });
     });
- function verificarLogin(req, res, next) {
-  if (!req.session.usuario) {
-     return res.render('usuarios/login.ejs', { 
-      erro: 'Você precisa fazer login para acessar esta página.' 
+
+    app.get('/convite', verificarLogin, (req, res) => {
+        res.render('home/convite.ejs', { usuario: req.session.usuario });
     });
-  }
-  next();
-}
 
-app.get('/convite', verificarLogin, (req, res) => {
-  res.render('home/convite.ejs', { usuario: req.session.usuario });
-});
-
-
-
-     app.get('/termos', function(req, res) {
+    app.get('/termos', function(req, res) {
         res.render('usuarios/termos.ejs');
     });
 
@@ -169,11 +158,24 @@ app.get('/convite', verificarLogin, (req, res) => {
         res.render('home/sobre.ejs', { usuario: req.session.usuario });
     });
 
-    
     app.get('/dama', function(req, res) {
         res.render('home/dama.ejs', { usuario: req.session.usuario });
     });
-
+app.get('/sudoku', function(req, res) {
+        res.render('home/sudoku.ejs', { usuario: req.session.usuario });
+    });
+    app.get('/stroop', function(req, res) {
+        res.render('home/stroop/stroop.ejs', { usuario: req.session.usuario });
+    });
+     app.get('/chess', function(req, res) {
+        res.render('home/chess/chess.ejs', { usuario: req.session.usuario });
+    });
+    app.get('/jdmemoria', function(req, res) {
+        res.render('home/jdmemoria/jdmemoria.ejs', { usuario: req.session.usuario });
+    });
+     app.get('/quebra', function(req, res) {
+        res.render('home/quebra/quebra.ejs', { usuario: req.session.usuario });
+    });
     app.get('/jogos', function(req, res) {
         res.render('home/jogos.ejs', { usuario: req.session.usuario });
     });
@@ -185,152 +187,157 @@ app.get('/convite', verificarLogin, (req, res) => {
     app.get('/perfil', function(req, res) {
         res.render('home/perfil.ejs', { usuario: req.session.usuario });
     });
-app.get('/recuperar-senha', function(req, res) {
-    res.render('usuarios/recuperar-senha.ejs', { mensagem: null });
-});
 
-   app.post('/recuperar-senha', function(req, res) {
-    const connection = app.infra.connectionFactory();
-    const usuariosDAO = new app.infra.UsuariosDAO(connection);
-    const { email } = req.body;
+    app.get('/recuperar-senha', function(req, res) {
+        res.render('usuarios/recuperar-senha.ejs', { mensagem: null });
+    });
 
-    if (!email) {
-        connection.end();
-        return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Informe seu e-mail.' });
-    }
+    app.post('/recuperar-senha', function(req, res) {
+        const connection = app.infra.connectionFactory();
+        const usuariosDAO = new app.infra.UsuariosDAO(connection);
+        const { email } = req.body;
 
-    usuariosDAO.buscarPorEmail(email, async function(err, results) {
-        if (err) {
+        if (!email) {
             connection.end();
-            console.error(err);
-            return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Erro ao buscar usuário.' });
+            return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Informe seu e-mail.' });
         }
 
-        if (results.length === 0) {
-            connection.end();
-             return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Se o e-mail existir, você receberá instruções para redefinir a senha.' });
-        }
-
-        const usuario = results[0];
-        const token = crypto.randomBytes(32).toString('hex');
-        const expira = new Date(Date.now() + 1000 * 60 * 60);
-
-        usuariosDAO.setResetToken(email, token, expira, async function(err2) {
-            connection.end();
-            if (err2) {
-                console.error(err2);
-                return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Erro ao gerar token.' });
+        usuariosDAO.buscarPorEmail(email, async function(err, results) {
+            if (err) {
+                connection.end();
+                console.error(err);
+                return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Erro ao buscar usuário.' });
             }
 
-            const link = `${process.env.BASE_URL}/redefinir-senha/${token}`;
-            const html = `
-                <p>Olá ${usuario.nome || ''},</p>
-                <p>Você solicitou a recuperação de senha. Clique no link abaixo para redefinir sua senha (válido por 1 hora):</p>
-                <p><a href="${link}">${link}</a></p>
-                <p>Se você não solicitou, ignore este e-mail.</p>
-            `;
-
-            const enviado = await enviarEmail(email, 'Redefinir sua senha', html);
-            if (enviado) {
+            if (results.length === 0) {
+                connection.end();
                 return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Se o e-mail existir, você receberá instruções para redefinir a senha.' });
-            } else {
-                return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Não foi possível enviar o e-mail. Tente novamente mais tarde.' });
-            }
-        });
-    });
-});
-app.get('/redefinir-senha/:token', function(req, res) {
-    const token = req.params.token;
-    const connection = app.infra.connectionFactory();
-    const usuariosDAO = new app.infra.UsuariosDAO(connection);
-
-    usuariosDAO.buscarPorResetToken(token, function(err, results) {
-        connection.end();
-        if (err) {
-            console.error(err);
-            return res.send('Erro ao processar requisição.');
-        }
-
-        if (results.length === 0) {
-            return res.send('Token inválido ou expirado.');
-        }
-
-        const usuario = results[0];
-        const agora = new Date();
-        if (!usuario.reset_token_expira || agora > new Date(usuario.reset_token_expira)) {
-            return res.send('Token expirado. Solicite recuperação novamente.');
-        }
-
-         res.render('usuarios/redefinir-senha.ejs', { token, mensagem: null });
-    });
-});
-
-app.post('/redefinir-senha/:token', function(req, res) {
-    const token = req.params.token;
-    const { senha, senhaConfirmacao } = req.body;
-
-    if (!senha || !senhaConfirmacao) {
-        return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Preencha os campos de senha.' });
-    }
-    if (senha !== senhaConfirmacao) {
-        return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'As senhas não coincidem.' });
-    }
-
-    const connection = app.infra.connectionFactory();
-    const usuariosDAO = new app.infra.UsuariosDAO(connection);
-
-    usuariosDAO.buscarPorResetToken(token, function(err, results) {
-        if (err) {
-            connection.end();
-            console.error(err);
-            return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Erro ao processar.' });
-        }
-
-        if (results.length === 0) {
-            connection.end();
-            return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Token inválido ou expirado.' });
-        }
-
-        const usuario = results[0];
-        const agora = new Date();
-        if (!usuario.reset_token_expira || agora > new Date(usuario.reset_token_expira)) {
-            connection.end();
-            return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Token expirado. Solicite recuperação novamente.' });
-        }
-
-         bcrypt.hash(senha, 12, function(errHash, hash) {
-            if (errHash) {
-                connection.end();
-                console.error(errHash);
-                return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Erro ao criptografar senha.' });
             }
 
-            usuariosDAO.atualizarSenhaPorId(usuario.id, hash, function(errUpdate) {
+            const usuario = results[0];
+            const token = crypto.randomBytes(32).toString('hex');
+            const expira = new Date(Date.now() + 1000 * 60 * 60);
+
+            usuariosDAO.setResetToken(email, token, expira, async function(err2) {
                 connection.end();
-                if (errUpdate) {
-                    console.error(errUpdate);
-                    return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Erro ao atualizar senha.' });
+                if (err2) {
+                    console.error(err2);
+                    return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Erro ao gerar token.' });
                 }
 
-                 return res.render('usuarios/login.ejs', { erro: 'Senha alterada com sucesso. Faça login.' });
+                const link = `${process.env.BASE_URL}/redefinir-senha/${token}`;
+                const html = `
+                    <p>Olá ${usuario.nome || ''},</p>
+                    <p>Você solicitou a recuperação de senha. Clique no link abaixo para redefinir sua senha (válido por 1 hora):</p>
+                    <p><a href="${link}">${link}</a></p>
+                    <p>Se você não solicitou, ignore este e-mail.</p>
+                `;
+
+                const enviado = await enviarEmail(email, 'Redefinir sua senha', html);
+                if (enviado) {
+                    return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Se o e-mail existir, você receberá instruções para redefinir a senha.' });
+                } else {
+                    return res.render('usuarios/recuperar-senha.ejs', { mensagem: 'Não foi possível enviar o e-mail. Tente novamente mais tarde.' });
+                }
             });
         });
     });
-});
 
+    app.get('/redefinir-senha/:token', function(req, res) {
+        const token = req.params.token;
+        const connection = app.infra.connectionFactory();
+        const usuariosDAO = new app.infra.UsuariosDAO(connection);
+
+        usuariosDAO.buscarPorResetToken(token, function(err, results) {
+            connection.end();
+            if (err) {
+                console.error(err);
+                return res.send('Erro ao processar requisição.');
+            }
+
+            if (results.length === 0) {
+                return res.send('Token inválido ou expirado.');
+            }
+
+            const usuario = results[0];
+            const agora = new Date();
+            if (!usuario.reset_token_expira || agora > new Date(usuario.reset_token_expira)) {
+                return res.send('Token expirado. Solicite recuperação novamente.');
+            }
+
+            res.render('usuarios/redefinir-senha.ejs', { token, mensagem: null });
+        });
+    });
+
+    app.post('/redefinir-senha/:token', function(req, res) {
+        const token = req.params.token;
+        const { senha, senhaConfirmacao } = req.body;
+
+        if (!senha || !senhaConfirmacao) {
+            return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Preencha os campos de senha.' });
+        }
+        if (senha !== senhaConfirmacao) {
+            return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'As senhas não coincidem.' });
+        }
+
+        const connection = app.infra.connectionFactory();
+        const usuariosDAO = new app.infra.UsuariosDAO(connection);
+
+        usuariosDAO.buscarPorResetToken(token, function(err, results) {
+            if (err) {
+                connection.end();
+                console.error(err);
+                return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Erro ao processar.' });
+            }
+
+            if (results.length === 0) {
+                connection.end();
+                return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Token inválido ou expirado.' });
+            }
+
+            const usuario = results[0];
+            const agora = new Date();
+            if (!usuario.reset_token_expira || agora > new Date(usuario.reset_token_expira)) {
+                connection.end();
+                return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Token expirado. Solicite recuperação novamente.' });
+            }
+
+            bcrypt.hash(senha, 12, function(errHash, hash) {
+                if (errHash) {
+                    connection.end();
+                    console.error(errHash);
+                    return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Erro ao criptografar senha.' });
+                }
+
+                usuariosDAO.atualizarSenhaPorId(usuario.id, hash, function(errUpdate) {
+                    connection.end();
+                    if (errUpdate) {
+                        console.error(errUpdate);
+                        return res.render('usuarios/redefinir-senha.ejs', { token, mensagem: 'Erro ao atualizar senha.' });
+                    }
+
+                    return res.render('usuarios/login.ejs', { erro: 'Senha alterada com sucesso. Faça login.' });
+                });
+            });
+        });
+    });
 
     app.get('/privacidade', function(req, res) {
         res.render('usuarios/privacidade.ejs');
     });
 
-     app.use(passport.initialize());
+  
+    app.use(passport.initialize());
     app.use(passport.session());
 
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/auth/google/callback"
+
+        callbackURL: process.env.GOOGLE_CALLBACK_URL
+
     }, async (accessToken, refreshToken, profile, done) => {
+
         const connection = app.infra.connectionFactory();
         const usuariosDAO = new app.infra.UsuariosDAO(connection);
 
@@ -360,21 +367,24 @@ app.post('/redefinir-senha/:token', function(req, res) {
     passport.serializeUser((user, done) => done(null, user));
     passport.deserializeUser((user, done) => done(null, user));
 
-    app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+    app.get('/auth/google', 
+        passport.authenticate('google', { scope: ['profile', 'email'] })
+    );
 
-  app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    (req, res) => {
-         req.session.usuario = {
-            id: req.user.id,  
-            nome: req.user.nome || req.user.displayName,
-            email: req.user.email || req.user.emails?.[0]?.value
-        };
+    app.get('/auth/google/callback',
+        passport.authenticate('google', { failureRedirect: '/login' }),
+        (req, res) => {
 
-        req.session.save(() => {  
-            res.redirect('/inicio');
-        });
-    }
-);
+            req.session.usuario = {
+                id: req.user.id,
+                nome: req.user.nome || req.user.displayName,
+                email: req.user.email || req.user.emails?.[0]?.value
+            };
+
+            req.session.save(() => {
+                res.redirect('/inicio');
+            });
+        }
+    );
 
 };

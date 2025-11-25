@@ -27,7 +27,12 @@
                 <li><a href="/sobre">Sobre</a></li>
                 <li><a href="#" class="ativo">Jogos</a></li>
                 <li><a href="/faq">Perguntas Frequentes</a></li>
-                <li><a href="/convite">Convites</a></li>
+                <li>
+                    <a href="/convite" id="linkConvite">
+                        Convites
+                        <span id="contadorConvite">0</span>
+                    </a>
+                </li>
                 <li class="dropdown-login">
                     <% if (usuario) { %>
                         <a href="/logout">Sair</a>
@@ -47,32 +52,29 @@
         <h1>Jogos</h1>
         <div class="grade-jogos">
             <div class="grade1">
-                <a class="card" href="../html/jogos/chess/chess.html">
-                    <img src="../html/assets/xadrez.svg " alt="Xadrez" loading="lazy">
+                <a class="card" href="/chess">
+                    <img src="../html/assets/xadrez.svg" alt="Xadrez" loading="lazy">
                     <span>Xadrez</span>
                 </a>
                 <a class="card" href="/dama">
                     <img src="../html/assets/dama.svg" alt="Damas" loading="lazy">
                     <span>Damas</span>
                 </a>
-
-                <a class="card" href="../html/jogos/sudoku.html?instrucoes=true">
+                <a class="card" href="/sudoku">
                     <img src="../html/assets/sudoku.png" alt="Sudoku" loading="lazy">
                     <span>Sudoku</span>
                 </a>
             </div>
             <div class="grade2">
-                <a class="card" href="../html/jogos/quebra/quebra.html" loading="lazy">
+                <a class="card" href="/quebra">
                     <img src="../html/assets/quebra.svg" alt="Quebra-Cabeça">
                     <span>Quebra-Cabeça</span>
                 </a>
-
-                <a class="card" href="../html/jogos/jdmemoria/jdmemoria.html" loading="lazy">
+                <a class="card" href="/jdmemoria">
                     <img src="../html/assets/memoria.svg" alt="Jogo da Memória">
                     <span>Jogo da Memória</span>
                 </a>
-
-                <a class="card" href="../html/jogos/stroop/stroop.html" loading="lazy">
+                <a class="card" href="/stroop">
                     <img src="../html/assets/stroop.png" alt="Desafio Stroop">
                     <span>Desafio Stroop</span>
                 </a>
@@ -102,7 +104,56 @@
             © 2025 Todos os direitos reservados.
         </div>
     </footer>
+
     <script src="../../js/atraso.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    (function () {
+    const socket = io();
+    const meuId = "<%= usuario ? usuario.id : '' %>";
+    socket.emit('registrarId', meuId);
+
+    const contador = document.getElementById('contadorConvite');
+    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+    let notificacoes = convites.length;
+
+    function atualizarContador() {
+        if (notificacoes > 0) {
+            contador.style.display = 'inline-block';
+            contador.textContent = notificacoes;
+        } else {
+            contador.style.display = 'none';
+        }
+    }
+
+    function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+    }
+
+    document.getElementById('linkConvite').addEventListener('click', () => {
+         notificacoes = 0;
+        atualizarContador();
+    });
+
+     socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    atualizarContador();
+})();
+    </script>
 </body>
 
 </html>

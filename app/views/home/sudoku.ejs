@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../../../assets/favicon/cerebro.png">
+  <link rel="stylesheet" href="./css/sudoku.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <title>Sudoku</title>
+</head>
+
+<body>
+
+   <a href="/convite" id="linkConvite" hidden>
+     <span id="contadorConvite"  hidden></span>
+  </a>
+
+  <h1 style="margin-top:60px;">Sudoku</h1>
+
+  <div class="top-bar">
+    <button id="reiniciar">Reiniciar</button>
+    <select id="dificuldade">
+      <optgroup label="Selecione a dificuldade">
+        <option value="easy">Fácil</option>
+        <option value="medium">Médio</option>
+        <option value="hard">Difícil</option>
+      </optgroup>
+    </select>
+    <button id="abrirInstrucoes">Como jogar</button>
+  </div>
+
+  <p id="mistakes" class="mistakes"></p>
+
+  <div class="game-container">
+    <div id="grid"></div>
+    <div id="selection"></div>
+  </div>
+
+  <div id="popupInicio">
+    <div class="conteudo">
+      <h2>Bem-vindo ao Sudoku</h2>
+      <p>Complete o tabuleiro de 9x9 com números de 1 a 9, sem repetir em linhas, colunas ou blocos.</p>
+      <video width="400" height="360" autoplay loop>
+        <source src="./js/assets/sudoku.mp4" type="video/mp4" autoplay loop>
+      </video>
+      <button id="fecharInicio">Entendi</button>
+    </div>
+  </div>
+
+  <div id="popupInstrucoes">
+    <div class="conteudo">
+      <h2>Como jogar</h2>
+      <p>Complete o tabuleiro de 9x9 com números de 1 a 9, sem repetir em linhas, colunas ou blocos.</p>
+      <video width="320" height="360" autoplay loop>
+        <source src="Sudoku - Brave 2025-11-20 14-37-20.mp4" type="video/mp4">
+      </video>
+      <button id="fecharPopup">Entendi</button>
+    </div>
+  </div>
+
+  <div id="game-over" style="display:none;">
+    <h2>Fim de Jogo!</h2>
+    <p>Você atingiu o número máximo de erros.</p>
+    <button id="restart">Jogar de Novo</button>
+    <a href="/jogos"><button id="exit">Sair</button></a>
+  </div>
+
+  <script src="./js/sudoku.js"></script>
+
+   <script>
+ 
+(function () {
+    const socket = io();
+    const meuId = "<%= usuario ? usuario.id : '' %>";
+    socket.emit('registrarId', meuId);
+
+    const contador = document.getElementById('contadorConvite');
+    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+    let notificacoes = convites.length;
+
+    function atualizarContador() {
+        if (notificacoes > 0) {
+            contador.style.display = 'inline-block';
+            contador.textContent = notificacoes;
+        } else {
+            contador.style.display = 'none';
+        }
+    }
+
+    function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+    }
+
+    document.getElementById('linkConvite').addEventListener('click', () => {
+         notificacoes = 0;
+        atualizarContador();
+    });
+
+     socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    atualizarContador();
+})();
+  </script>
+
+</body>
+</html>

@@ -29,8 +29,12 @@
                 <li><a href="#" class="ativo">Sobre</a></li>
                 <li><a href="/jogos">Jogos</a></li>
                 <li><a href="/faq">Perguntas Frequentes</a></li>
-                <li><a href="/convite">Convites</a></li>
-
+                <li>
+                    <a href="/convite" id="linkConvite">
+                        Convites
+                        <span id="contadorConvite">0</span>
+                    </a>
+                </li>
                 <li class="dropdown-login">
                     <% if (usuario) { %>
                         <a href="/logout">Sair</a>
@@ -42,11 +46,9 @@
                             </div>
                             <% } %>
                 </li>
-
             </ul>
         </nav>
     </header>
-
 
     <main class="sobre-container">
         <section class="introducao">
@@ -127,7 +129,7 @@
         </section>
     </main>
 
-    <footer>
+      <footer>
         <div class="footer-top">
             <ul>
                 <li>Início</li>
@@ -135,14 +137,14 @@
                 <li>Jogos</li>
             </ul>
             <ul>
-                <li>Recursos</li>
-                <li>Contato</li>
-                <li>Ajuda</li>
+                <li>FAQ</li>
+                <li>Convites</li>
+                <li>Doação</li>
             </ul>
             <ul>
-                <li>Recursos</li>
-                <li>Contato</li>
-                <li>Ajuda</li>
+                <li>Twitter</li>
+                <li>Instagram</li>
+                <li>Facebook</li>
             </ul>
         </div>
         <div class="footer-bottom">
@@ -150,6 +152,54 @@
         </div>
     </footer>
     <script src="../../js/atraso.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+   <script>
+    (function () {
+    const socket = io();
+    const meuId = "<%= usuario ? usuario.id : '' %>";
+    socket.emit('registrarId', meuId);
+
+    const contador = document.getElementById('contadorConvite');
+    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+    let notificacoes = convites.length;
+
+    function atualizarContador() {
+        if (notificacoes > 0) {
+            contador.style.display = 'inline-block';
+            contador.textContent = notificacoes;
+        } else {
+            contador.style.display = 'none';
+        }
+    }
+
+    function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+    }
+
+    document.getElementById('linkConvite').addEventListener('click', () => {
+         notificacoes = 0;
+        atualizarContador();
+    });
+
+     socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    atualizarContador();
+})();
+    </script>
 </body>
 
 </html>

@@ -27,18 +27,23 @@
                 <li><a href="/sobre">Sobre</a></li>
                 <li><a href="/jogos">Jogos</a></li>
                 <li><a href="#" class="ativo">Perguntas Frequentes</a></li>
-                <li><a href="/convite">Convites</a></li>
+                <li>
+                    <a href="/convite" id="linkConvite">
+                        Convites
+                        <span id="contadorConvite">0</span>
+                    </a>
+                </li>
 
                 <li class="dropdown-login">
                     <% if (usuario) { %>
                         <a href="/logout">Sair</a>
-                    <% } else { %>
-                        <span class="dropdown-toggle">Login ▼</span>
-                        <div class="dropdown-content-login">
-                            <a href="/login">Entrar</a>
-                            <a href="/registro">Registrar</a>
-                        </div>
-                    <% } %>
+                        <% } else { %>
+                            <span class="dropdown-toggle">Login ▼</span>
+                            <div class="dropdown-content-login">
+                                <a href="/login">Entrar</a>
+                                <a href="/registro">Registrar</a>
+                            </div>
+                            <% } %>
                 </li>
             </ul>
         </nav>
@@ -73,18 +78,16 @@
         <section class="faq-form">
             <h2>Não encontrou sua dúvida?</h2>
             <form id="faq-form">
-                 <% if (usuario) { %>
+                <% if (usuario) { %>
                     <input type="hidden" name="email" value="<%= usuario.email %>">
-                <% } %>
+                    <% } %>
 
-                <label for="pergunta">Envie sua pergunta:</label>
-                <textarea name="pergunta" id="pergunta" rows="4" required></textarea>
-                <button type="submit" id="submit">Enviar</button>
+                        <label for="pergunta">Envie sua pergunta:</label>
+                        <textarea name="pergunta" id="pergunta" rows="4" required></textarea>
+                        <button type="submit" id="submit">Enviar</button>
             </form>
         </section>
     </main>
-    
-
     <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script>
         emailjs.init("e0yS1nwLBaxrzQdjq");
@@ -95,7 +98,7 @@
             emailjs.sendForm('service_memoriam', 'template_5hn6gdh', this)
                 .then(() => {
                     alert('Pergunta enviada com sucesso!');
-                 })
+                })
                 .catch(err => {
                     alert('Erro ao enviar: ' + JSON.stringify(err));
                 });
@@ -124,6 +127,55 @@
         });
     </script>
 
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    (function () {
+    const socket = io();
+    const meuId = "<%= usuario ? usuario.id : '' %>";
+    socket.emit('registrarId', meuId);
+
+    const contador = document.getElementById('contadorConvite');
+    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+    let notificacoes = convites.length;
+
+    function atualizarContador() {
+        if (notificacoes > 0) {
+            contador.style.display = 'inline-block';
+            contador.textContent = notificacoes;
+        } else {
+            contador.style.display = 'none';
+        }
+    }
+
+    function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+    }
+
+    document.getElementById('linkConvite').addEventListener('click', () => {
+         notificacoes = 0;
+        atualizarContador();
+    });
+
+     socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    atualizarContador();
+})();
+    </script>
+
     <footer>
         <div class="footer-top">
             <ul>
@@ -132,14 +184,14 @@
                 <li>Jogos</li>
             </ul>
             <ul>
-                <li>Recursos</li>
-                <li>Contato</li>
-                <li>Ajuda</li>
+                <li>FAQ</li>
+                <li>Convites</li>
+                <li>Doação</li>
             </ul>
             <ul>
-                <li>Recursos</li>
-                <li>Contato</li>
-                <li>Ajuda</li>
+                <li>Twitter</li>
+                <li>Instagram</li>
+                <li>Facebook</li>
             </ul>
         </div>
         <div class="footer-bottom">

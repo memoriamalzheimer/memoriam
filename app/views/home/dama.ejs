@@ -5,12 +5,10 @@
   <meta charset="utf-8" />
   <link rel="icon" type="image/png" href="../assets/favicon/cerebro.png">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="../css/dama.css">
   <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="../css/dama.css">
+
   <title>Jogo de Dama</title>
-  <style>
-   
-  </style>
 </head>
 
 <body>
@@ -53,6 +51,21 @@
     <button id="fecharConviteBtn">Fechar</button>
   </div>
 
+  <div id="popupInicio">
+    <div class="conteudo">
+      <h2>Bem-vindo ao Jogo de Dama</h2>
+      <p>Convide outro jogador pelo ID para começar uma partida online ou jogue local com uma outra pessoa.</p>
+      <button id="fecharPopupInicio">Começar</button>
+    </div>
+  </div>
+
+  <div id="popupVencedor">
+    <div class="conteudo">
+      <h2 id="vencedorTitulo">Vencedor!</h2>
+      <button id="fecharPopupVencedor">Fechar</button>
+    </div>
+  </div>
+
   <div id="statusBar">Conectando...</div>
 
   <div id="chat">
@@ -64,18 +77,12 @@
   </div>
 
   <script>
-
-     document.getElementById("mensagemInput").addEventListener("keyup", function(e){
-      if (e.key === "Enter"){
-        document.getElementById('btnEnviarMensagem').click();
-      }
+    document.getElementById("mensagemInput").addEventListener("keyup", function (e) {
+      if (e.key === "Enter") document.getElementById('btnEnviarMensagem').click();
     });
-     document.getElementById("idOponente").addEventListener("keyup", function(e){
-      if (e.key === "Enter"){
-        document.getElementById('btnConvidar').click();
-      }
+    document.getElementById("idOponente").addEventListener("keyup", function (e) {
+      if (e.key === "Enter") document.getElementById('btnConvidar').click();
     });
-
 
     const socket = io();
     const meuId = 'user-' + Math.floor(Math.random() * 999999);
@@ -93,7 +100,6 @@
       socket.emit('registrarId', meuId);
       if (salaQuery) socket.emit('entrarSala', { sala: salaQuery });
     });
-
     socket.on('disconnect', () => statusBar.textContent = 'Desconectado');
     socket.on('erroConvite', ({ msg }) => alert(msg));
     socket.on('onlineUsers', lista => console.log('Online:', lista));
@@ -131,20 +137,37 @@
       window.location.href = window.location.pathname + '?sala=' + encodeURIComponent(sala) + '&lado=' + lado;
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      boardElement = document.getElementById('board');
-      criarTabuleiro();
-      atualizarStatus();
-      document.getElementById('reiniciar').onclick = reiniciar;
-      document.getElementById('undo').onclick = desfazer;
-      document.getElementById('instrucoesBtn').onclick = () => document.getElementById('popupInstrucoes').style.display = 'flex';
-      document.getElementById('fecharPopup').onclick = () => document.getElementById('popupInstrucoes').style.display = 'none';
-      if (meuLado) ladoLabel.textContent = meuLado === 'red' ? 'Vermelho' : 'Branco';
-      socket.on('movimento', executarMovimentoDoOutro);
-      
-    });
+   document.addEventListener('DOMContentLoaded', () => {
+  boardElement = document.getElementById('board');
+  criarTabuleiro();
+  atualizarStatus();
 
-   
+  const btnReiniciar = document.getElementById('reiniciar');
+  const btnUndo = document.getElementById('undo');
+
+  btnReiniciar.onclick = reiniciar;
+  btnUndo.onclick = desfazer;
+
+  document.getElementById('instrucoesBtn').onclick = () => document.getElementById('popupInstrucoes').style.display = 'flex';
+  document.getElementById('fecharPopup').onclick = () => document.getElementById('popupInstrucoes').style.display = 'none';
+
+  if (meuLado) ladoLabel.textContent = meuLado === 'red' ? 'Vermelho' : 'Branco';
+
+   if (salaQuery) {
+    btnReiniciar.style.display = 'none';
+    btnUndo.style.display = 'none';
+  }
+
+  socket.on('movimento', executarMovimentoDoOutro);
+});
+
+
+    window.onload = () => {
+      document.getElementById("popupInicio").style.display = "flex";
+    };
+    document.getElementById("fecharPopupInicio").onclick = () => {
+      document.getElementById("popupInicio").style.display = "none";
+    };
 
     function criarTabuleiro() {
       boardElement.innerHTML = '';
@@ -217,24 +240,71 @@
       return moves;
     }
 
-    function mostrarMovimentos(p) { possibleMoves = calcularMovimentos(p, false); const obrigatorias = pecasComCaptura(turn); if (obrigatorias.length > 0) possibleMoves = possibleMoves.filter(m => m.capture); highlightMoves(); }
+    function mostrarMovimentos(p) {
+      possibleMoves = calcularMovimentos(p, false);
+      const obrigatorias = pecasComCaptura(turn);
+      if (obrigatorias.length > 0) possibleMoves = possibleMoves.filter(m => m.capture);
+      highlightMoves();
+    }
+
     function highlightMoves() { possibleMoves.forEach(m => { const c = getCell(m.row, m.col); if (c) c.classList.add(m.capture ? 'capture' : 'highlight'); }); }
     function limparHighlights() { document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight', 'capture')); possibleMoves = []; selectedPiece = null; }
     function clicarCelula(cell) { if (!selectedPiece) return; if (meuLado && turn !== meuLado) return; if (meuLado && !selectedPiece.classList.contains(meuLado)) return; const r = parseInt(cell.dataset.row), c = parseInt(cell.dataset.col); const dest = possibleMoves.find(m => m.row === r && m.col === c); if (dest) moverPeca(selectedPiece, cell, dest.capture); }
-    function moverPeca(p, destino, captureCell) { const origem = p.parentElement; destino.appendChild(p); if (captureCell) { const cap = captureCell.children[0]; if (cap) { const cor = cap.classList.contains('red') ? 'red' : 'white'; captureCell.innerHTML = ''; score[cor]++; } } promover(p, destino); moveHistory.push({ p, origem, destino, captureCell }); document.getElementById('undo').disabled = false; limparHighlights(); trocarTurno(); const mov = { origem: getCellIndex(origem), destino: getCellIndex(destino), capturada: captureCell ? getCellIndex(captureCell) : null, king: p.classList.contains('king'), nextTurn: turn }; enviarMovimentoSocket(mov); }
+
+    function moverPeca(p, destino, captureCell) {
+      const origem = p.parentElement;
+      destino.appendChild(p);
+      if (captureCell) {
+        const cap = captureCell.children[0];
+        if (cap) {
+          const cor = cap.classList.contains('red') ? 'red' : 'white';
+          captureCell.innerHTML = '';
+          score[cor]++;
+        }
+      }
+      promover(p, destino);
+      moveHistory.push({ p, origem, destino, captureCell });
+      document.getElementById('undo').disabled = false;
+      limparHighlights();
+      trocarTurno();
+
+      const mov = { origem: getCellIndex(origem), destino: getCellIndex(destino), capturada: captureCell ? getCellIndex(captureCell) : null, king: p.classList.contains('king'), nextTurn: turn };
+      enviarMovimentoSocket(mov);
+
+      verificarVencedor();
+    }
+
     function promover(p, d) { const r = parseInt(d.dataset.row); if (p.classList.contains('red') && r === 0) p.classList.add('king'); if (p.classList.contains('white') && r === 7) p.classList.add('king'); }
     function trocarTurno() { turn = (turn === 'red') ? 'white' : 'red'; atualizarStatus(); }
     function atualizarStatus() { document.getElementById('turnLabel').textContent = turn === 'red' ? 'Vermelho' : 'Branco'; document.getElementById('scoreRed').textContent = score.red; document.getElementById('scoreWhite').textContent = score.white; }
     function desfazer() { const last = moveHistory.pop(); if (!last) return; last.origem.appendChild(last.p); if (last.captureCell) { const pc = document.createElement('div'); const cor = (last.p && last.p.classList.contains('red')) ? 'white' : ((last.p && last.p.classList.contains('white')) ? 'red' : 'white'); pc.className = 'piece ' + cor; last.captureCell.appendChild(pc); score[cor]--; } if (moveHistory.length === 0) document.getElementById('undo').disabled = true; trocarTurno(); }
     function getCell(r, c) { return document.querySelector('.cell[data-row="' + r + '"][data-col="' + c + '"]'); }
     function getCellIndex(cell) { return { row: parseInt(cell.dataset.row), col: parseInt(cell.dataset.col) }; }
-    function executarMovimentoDoOutro(m) { const o = getCell(m.origem.row, m.origem.col); const d = getCell(m.destino.row, m.destino.col); if (!o || !d) return; const p = o.children[0]; if (!p) return; d.appendChild(p); if (m.capturada) { const c = getCell(m.capturada.row, m.capturada.col); if (c && c.children[0]) { const cor = c.children[0].classList.contains('red') ? 'red' : 'white'; c.innerHTML = ''; score[cor]++; } } if (m.king) p.classList.add('king'); turn = m.nextTurn || ((turn === 'red') ? 'white' : 'red'); atualizarStatus(); limparHighlights(); }
+    function executarMovimentoDoOutro(m) { const o = getCell(m.origem.row, m.origem.col); const d = getCell(m.destino.row, m.destino.col); if (!o || !d) return; const p = o.children[0]; if (!p) return; d.appendChild(p); if (m.capturada) { const c = getCell(m.capturada.row, m.capturada.col); if (c && c.children[0]) { const cor = c.children[0].classList.contains('red') ? 'red' : 'white'; c.innerHTML = ''; score[cor]++; } } if (m.king) p.classList.add('king'); turn = m.nextTurn || ((turn === 'red') ? 'white' : 'red'); atualizarStatus(); limparHighlights(); verificarVencedor(); }
     function enviarMovimentoSocket(mov) { const sala = salaQuery; if (!sala) return; socket.emit('movimento', { sala, movimento: mov }); }
     function reiniciar() { posicionarPecas(); score = { red: 0, white: 0 }; moveHistory = []; turn = 'red'; atualizarStatus(); document.getElementById('undo').disabled = true; limparHighlights(); }
 
-    
+    function verificarVencedor() {
+      const redCount = document.querySelectorAll('.piece.red').length;
+      const whiteCount = document.querySelectorAll('.piece.white').length;
+
+      if (redCount === 0 || whiteCount === 0) {
+        const vencedor = redCount === 0 ? 'Branco' : 'Vermelho';
+        mostrarPopupVencedor(vencedor);
+      }
+    }
+
+    function mostrarPopupVencedor(vencedor) {
+      const popup = document.getElementById('popupVencedor');
+      document.getElementById('vencedorTitulo').textContent = `Vencedor: ${vencedor}`;
+      popup.style.display = 'flex';
+
+      document.getElementById('fecharPopupVencedor').onclick = () => {
+        popup.style.display = 'none';
+        reiniciar();
+      };
+    }
   </script>
-   
 </body>
 
 </html>

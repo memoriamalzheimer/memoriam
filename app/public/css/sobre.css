@@ -7,9 +7,19 @@
 
 .sobre-container {
     max-width: 900px;
-    margin:  0 auto 60px auto;
+    margin: 0 auto 60px auto;
     padding: 0 20px;
     line-height: 1.7;
+}
+
+#contadorConvite {
+    display: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    margin-left: 5px;
 }
 
 .sobre-container h1 {

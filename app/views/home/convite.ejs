@@ -59,8 +59,8 @@
       margin: 0;
     }
 
-    li {
-      padding: 8px 0;
+    .convite-item {
+      padding: 12px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       display: flex;
       justify-content: space-between;
@@ -70,6 +70,7 @@
     .btn-accept {
       background: #047857;
       color: white;
+      margin-bottom: 15px;
     }
 
     .btn-decline {
@@ -84,13 +85,9 @@
       font-size: 13px;
     }
 
-    .video-btn {
-      background: #0b74ff;
-      color: white;
-      margin-left: 8px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 0;
+    .empty {
+      color: #6b7280;
+      font-size: 14px;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -117,40 +114,32 @@
         color: #e6edf3;
       }
 
-      li {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      }
-
       .btn-accept {
         background: #047857;
-        color: white;
       }
 
       .btn-decline {
         background: #b91c1c;
-        color: white;
       }
     }
   </style>
 </head>
 
 <body>
-
   <div class="container">
     <h1>Convites</h1>
 
     <div class="row">
       <div class="panel" style="flex:1;">
         <p class="small">Seu ID: <strong><%= usuario.id %></strong></p>
-        <p class="hint">Esta página mostra convites recebidos em tempo real. Quando aceitar, você será redirecionado(a)
-          para a mesma sala do jogador que convidou.</p>
+        <p class="hint">Convites recebidos (pendentes) — ao aceitar você será redirecionado.</p>
         <div class="status" id="status">Conectando ao servidor...</div>
       </div>
 
       <div class="panel" style="flex:2;">
         <h3 style="margin-top:0">Convites recebidos</h3>
         <div id="listaConvites">
-          <p class="small">Nenhum convite no momento.</p>
+          <p class="small empty">Nenhum convite no momento.</p>
         </div>
       </div>
 
@@ -159,14 +148,13 @@
         <ul id="onlineUsers">
           <li class="small">Carregando...</li>
         </ul>
-        <p class="hint">Este painel é apenas informativo. Para convidar, use o botão "Convidar" dentro da página do jogo
-          (Dama) ou use o campo abaixo para convidar por ID (pode convidar para jogo ou videochamada).</p>
+        <p class="hint">Use o painel para convidar por ID ou aceite os convites nesta página.</p>
 
         <div style="margin-top:8px;">
           <input id="inputConviteId" placeholder="ID para convidar" style="width:100%;box-sizing:border-box" />
           <div style="margin-top:8px; display:flex; gap:8px;">
-            <button onclick="enviarConviteFromInput()" style="flex:1">Convidar</button>
-            <button onclick="enviarConviteVideoFromInput()" class="video-btn">Convidar p/ vídeo</button>
+            <button onclick="enviarConviteFromInput()" style="flex:1">Convidar para dama</button>
+            <button onclick="enviarConviteVideoFromInput()" class="video-btn">Vídeo</button>
           </div>
         </div>
       </div>
@@ -180,151 +168,198 @@
       const statusEl = document.getElementById('status');
       const listaEl = document.getElementById('listaConvites');
       const onlineEl = document.getElementById('onlineUsers');
+      const TEMPO_EXPIRAR = 5 * 60 * 1000;
 
-      socket.emit('registrarId', meuId);
+       function carregarConvitesSalvos() {
+        const salvo = localStorage.getItem("convitesPendentes");
+        if (!salvo) return [];
+        try { return JSON.parse(salvo); } catch { return []; }
+      }
+
+      function salvarConvites(lista) {
+        localStorage.setItem("convitesPendentes", JSON.stringify(lista));
+      }
+
+      function adicionarConviteLocalObj(obj) {
+        const lista = carregarConvitesSalvos();
+        if (!lista.some(c => c.id === obj.id)) {
+          lista.push(obj);
+          salvarConvites(lista);
+        }
+      }
+
+      function removerConviteLocalById(id) {
+        let lista = carregarConvitesSalvos();
+        lista = lista.filter(c => c.id !== id);
+        salvarConvites(lista);
+      }
+
+      function limparExpiradosLocais() {
+        const lista = carregarConvitesSalvos();
+        const agora = Date.now();
+        const filtrados = lista.filter(c => agora - c.timestamp < TEMPO_EXPIRAR);
+        if (filtrados.length !== lista.length) salvarConvites(filtrados);
+      }
+
+      function limparTodosConvitesLocais() {
+        localStorage.removeItem("convitesPendentes");
+      }
+
+       function criarItemConvite(convite) {
+        const item = document.createElement('div');
+        item.className = 'convite-item';
+        item.dataset.id = convite.id;
+
+        const txt = document.createElement('div');
+        txt.innerHTML = convite.tipo === 'jogo'
+          ? `<strong>Jogador ${convite.de}</strong> te convidou para jogar.`
+          : `<strong>Jogador ${convite.de}</strong> te convidou para uma <strong>videochamada</strong>.`;
+
+        const actions = document.createElement('div');
+
+        const btnAceitar = document.createElement('button');
+        btnAceitar.textContent = 'Aceitar';
+        btnAceitar.className = 'btn-accept';
+        btnAceitar.style.marginRight = '8px';
+        btnAceitar.onclick = () => {
+          if (convite.tipo === 'jogo') {
+            socket.emit('aceitarConvite', { de: convite.de, para: meuId, conviteId: convite.id });
+          } else {
+            socket.emit('aceitarConviteVideo', { de: convite.de, para: meuId, conviteId: convite.id });
+          }
+          removerConviteLocalById(convite.id);
+          item.remove();
+          checkEmptyList();
+        };
+
+        const btnRecusar = document.createElement('button');
+        btnRecusar.textContent = 'Recusar';
+        btnRecusar.className = 'btn-decline';
+        btnRecusar.onclick = () => {
+          socket.emit('recusarConvite', { de: convite.de, para: meuId, conviteId: convite.id });
+          removerConviteLocalById(convite.id);
+          item.remove();
+          checkEmptyList();
+        };
+
+        actions.appendChild(btnAceitar);
+        actions.appendChild(btnRecusar);
+        item.appendChild(txt);
+        item.appendChild(actions);
+
+        return item;
+      }
+
+      function renderConvitesLista() {
+        limparExpiradosLocais();
+        const lista = carregarConvitesSalvos();
+        listaEl.innerHTML = '';
+        if (!lista || lista.length === 0) {
+          listaEl.innerHTML = '<p class="small empty">Nenhum convite no momento.</p>';
+          return;
+        }
+        lista.forEach(c => listaEl.appendChild(criarItemConvite(c)));
+      }
+
+      function checkEmptyList() {
+        if (!listaEl.querySelector('.convite-item')) {
+          listaEl.innerHTML = '<p class="small empty">Nenhum convite no momento.</p>';
+        }
+      }
+
+       socket.emit('registrarId', meuId);
+      socket.emit('pedirOnline');
 
       socket.on('connect', () => {
         statusEl.textContent = 'Conectado ao servidor.';
+        renderConvitesLista();
       });
 
       socket.on('disconnect', () => {
         statusEl.textContent = 'Desconectado do servidor.';
+        limparTodosConvitesLocais();
+        renderConvitesLista();
       });
 
-      socket.on('onlineUsers', (lista) => {
+      socket.on('onlineUsers', lista => {
         onlineEl.innerHTML = '';
         if (!Array.isArray(lista) || lista.length === 0) {
           onlineEl.innerHTML = '<li class="small">Nenhum usuário online</li>';
           return;
         }
         lista.forEach(id => {
+          if (id === meuId) return;
           const li = document.createElement('li');
-          li.innerHTML = `<span>${id}</span> <span><button onclick="enviarConvitePorId('${id}')">Convidar</button> <button onclick="enviarConviteVideoPorId('${id}')" class="video-btn">Vídeo</button></span>`;
+          li.innerHTML = `<span>${id}</span> <span>
+                <button onclick="enviarConvitePorId('${id}')">Convidar para dama</button> 
+                <button onclick="enviarConviteVideoPorId('${id}')" class="video-btn">Vídeo</button>
+            </span>`;
           onlineEl.appendChild(li);
         });
       });
 
-      socket.on('conviteRecebido', ({ de }) => {
-        const item = document.createElement('div');
-        item.style.marginBottom = '8px';
-        item.style.display = 'flex';
-        item.style.justifyContent = 'space-between';
-        item.style.alignItems = 'center';
-
-        const txt = document.createElement('div');
-        txt.innerHTML = `<strong>Jogador ${de}</strong> te convidou para jogar.`;
-
-        const actions = document.createElement('div');
-
-        const btnAceitar = document.createElement('button');
-        btnAceitar.textContent = 'Aceitar';
-        btnAceitar.className = 'btn-accept';
-        btnAceitar.style.marginRight = '8px';
-        btnAceitar.onclick = () => {
-          socket.emit('aceitarConvite', { de, para: meuId });
-          statusEl.textContent = 'Aceitando convite...';
-        };
-
-        const btnRecusar = document.createElement('button');
-        btnRecusar.textContent = 'Recusar';
-        btnRecusar.className = 'btn-decline';
-        btnRecusar.onclick = () => {
-          item.remove();
-        };
-
-        actions.appendChild(btnAceitar);
-        actions.appendChild(btnRecusar);
-        item.appendChild(txt);
-        item.appendChild(actions);
-
+      socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || ('local-' + Date.now() + '-' + Math.floor(Math.random() * 1000));
+        const convite = { id, tipo: 'jogo', de, timestamp: Date.now() };
+        adicionarConviteLocalObj(convite);
+        const item = criarItemConvite(convite);
         if (listaEl.querySelector('.small')) listaEl.innerHTML = '';
-        listaEl.appendChild(item);
+        listaEl.prepend(item);
       });
 
-       socket.on('conviteVideoRecebido', ({ de }) => {
-        const item = document.createElement('div');
-        item.style.marginBottom = '8px';
-        item.style.display = 'flex';
-        item.style.justifyContent = 'space-between';
-        item.style.alignItems = 'center';
-
-        const txt = document.createElement('div');
-        txt.innerHTML = `<strong>Jogador ${de}</strong> te convidou para uma <strong>videochamada</strong>.`;
-
-        const actions = document.createElement('div');
-
-        const btnAceitar = document.createElement('button');
-        btnAceitar.textContent = 'Aceitar';
-        btnAceitar.className = 'btn-accept';
-        btnAceitar.style.marginRight = '8px';
-        btnAceitar.onclick = () => {
-          socket.emit('aceitarConviteVideo', { de, para: meuId });
-          statusEl.textContent = 'Aceitando convite de vídeo...';
-        };
-
-        const btnRecusar = document.createElement('button');
-        btnRecusar.textContent = 'Recusar';
-        btnRecusar.className = 'btn-decline';
-        btnRecusar.onclick = () => {
-          item.remove();
-        };
-
-        actions.appendChild(btnAceitar);
-        actions.appendChild(btnRecusar);
-        item.appendChild(txt);
-        item.appendChild(actions);
-
+      socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || ('local-' + Date.now() + '-' + Math.floor(Math.random() * 1000));
+        const convite = { id, tipo: 'video', de, timestamp: Date.now() };
+        adicionarConviteLocalObj(convite);
+        const item = criarItemConvite(convite);
         if (listaEl.querySelector('.small')) listaEl.innerHTML = '';
-        listaEl.appendChild(item);
+        listaEl.prepend(item);
       });
 
-      socket.on('erroConvite', ({ msg }) => {
-        statusEl.textContent = 'Erro: ' + msg;
-        setTimeout(() => statusEl.textContent = 'Conectado ao servidor.', 4000);
-      });
-
-      socket.on('conviteEnviado', ({ para }) => {
-        statusEl.textContent = 'Convite enviado para ' + para;
-        setTimeout(() => statusEl.textContent = 'Conectado ao servidor.', 3000);
-      });
-
-      socket.on('conviteEnviadoVideo', ({ para }) => {
-        statusEl.textContent = 'Convite de vídeo enviado para ' + para;
-        setTimeout(() => statusEl.textContent = 'Conectado ao servidor.', 3000);
-      });
-
-       socket.on('conviteAceito', ({ sala }) => {
+      socket.on('conviteAceito', ({ sala, lado }) => {
         statusEl.textContent = 'Convite aceito — abrindo sala...';
-        window.location.href = '/dama?sala=' + encodeURIComponent(sala);
+        window.location.href = '/dama?sala=' + encodeURIComponent(sala) + '&lado=' + lado;
       });
 
-       socket.on('conviteVideoAceito', ({ sala }) => {
+      socket.on('conviteVideoAceito', ({ sala }) => {
         statusEl.textContent = 'Convite aceito — abrindo sala de vídeo...';
         window.location.href = '/videochamada?sala=' + encodeURIComponent(sala);
       });
 
+      socket.on('removerConvite', ({ conviteId }) => {
+        if (!conviteId) return;
+        removerConviteLocalById(conviteId);
+        const el = listaEl.querySelector(`.convite-item[data-id="${conviteId}"]`);
+        if (el) el.remove();
+        checkEmptyList();
+      });
+
        window.enviarConvitePorId = function (destinoId) {
+        if (!destinoId || destinoId === meuId) return alert('ID inválido');
         socket.emit('enviarConvite', { de: meuId, para: destinoId });
       };
 
       window.enviarConviteVideoPorId = function (destinoId) {
+        if (!destinoId || destinoId === meuId) return alert('ID inválido');
         socket.emit('enviarConviteVideo', { de: meuId, para: destinoId });
       };
 
-       window.enviarConviteFromInput = function () {
+      window.enviarConviteFromInput = function () {
         const id = document.getElementById('inputConviteId').value.trim();
-        if (!id) return alert('Digite um ID');
         window.enviarConvitePorId(id);
       };
+
       window.enviarConviteVideoFromInput = function () {
         const id = document.getElementById('inputConviteId').value.trim();
-        if (!id) return alert('Digite um ID');
         window.enviarConviteVideoPorId(id);
       };
 
+      renderConvitesLista();
+      setInterval(() => {
+        limparExpiradosLocais();
+        renderConvitesLista();
+      }, 10000);
     })();
   </script>
-  <script src="../../js/atraso.js"></script>
 </body>
-
 </html>

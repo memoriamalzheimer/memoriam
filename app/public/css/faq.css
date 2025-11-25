@@ -8,8 +8,18 @@
 .faq-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 4rem 20px 2rem 20px;
+    padding: 0 20px 2rem 20px;
     line-height: 1.8;
+}
+
+#contadorConvite {
+    display: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    margin-left: 5px;
 }
 
 .faq-container h1 {
@@ -17,7 +27,7 @@
     color: #004279;
     font-size: 2.5rem;
     margin-bottom: 1rem;
-      margin-top: 0; 
+    margin-top: 0;
 }
 
 .faq-item {
@@ -114,6 +124,7 @@
         opacity: 0;
         transform: translateY(-8px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
@@ -125,6 +136,7 @@
         opacity: 1;
         transform: translateY(0);
     }
+
     100% {
         opacity: 0;
         transform: translateY(-8px);

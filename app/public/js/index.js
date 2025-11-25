@@ -1,7 +1,8 @@
 const imagens = [
     'https://images.unsplash.com/photo-1666606341560-47c022478e23?q=80&w=870&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=870&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=870&auto=format&fit=crop'
+    'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=870&auto=format&fit=crop',
+    
 ];
  const textos = [
     'Cuidando da sua saúde',

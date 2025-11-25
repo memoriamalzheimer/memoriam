@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./css/stroop.css">
+  <link rel="icon" type="image/png" href="../../../assets/favicon/cerebro.png">
+      <script src="/socket.io/socket.io.js"></script>
+
+  <title>Stroop</title>
+  <style>
+   </style>
+</head>
+<body>
+     <a href="/convite" id="linkConvite" hidden>
+     <span id="contadorConvite"  hidden></span>
+  </a>
+  <h1>Jogo de Stroop</h1>
+
+  <div class="top-bar">
+    <button id="reiniciar">Reiniciar</button>
+    <select id="dificuldade">
+      <optgroup label="Selecione a dificuldade">
+        <option value="facil">Fácil</option>
+        <option value="medio">Médio</option>
+        <option value="dificil">Difícil</option>
+      </optgroup>
+    </select>
+    <button id="htpb">Como jogar</button>
+  </div>
+
+  <div id="popupInstrucoes">
+    <div class="conteudo">
+      <h2>Como jogar</h2>
+      <p>Clique no botão que corresponde à <strong>cor do texto</strong>, não ao nome da cor!</p>
+      <p>Se o cronômetro zerar, você perde</p>
+      <p>Há 3 modos, o <span id="facil">fácil</span>, o <span id="medio">médio</span> e o <span id="dificil">Difícil</span>. No modo fácil, a palavra demora 5 segundos pra sumir, no modo médio 3 e no modo difícil 1. </p>
+      <p>Cada acerto aumenta o tempo do cronômetro, porém, no modo difícil, cada erro tira 3 segundos do cronômetro.</p>
+      <button id="fecharPopup">Entendi</button>
+    </div>
+  </div>
+
+  <div id="popupHTPB">
+    <div class="conteudo">
+      <h2>Como jogar</h2>
+      <p>Aqui você pode colocar informações extras sobre o jogo ou tutorial.</p>
+      <button id="fecharHTPB">Entendi</button>
+    </div>
+  </div>
+
+  <div id="game-container">
+    <div id="word">Pronto?</div>
+    <div class="btn-container" id="buttons"></div>
+    <div id="score">Pontuação: 0</div>
+    <div id="timer">Tempo: 0s</div>
+    <button id="restart">Jogar Novamente</button>
+  </div>
+
+<script>
+const cores = ["Vermelho", "Azul", "Verde", "Amarelo"];
+const valores = ["red", "blue", "green", "yellow"];
+const wordEl = document.getElementById("word");
+const buttonsEl = document.getElementById("buttons");
+const scoreEl = document.getElementById("score");
+const timerEl = document.getElementById("timer");
+const restartBtn = document.getElementById("restart");
+const gameContainer = document.getElementById("game-container");
+
+const popup = document.getElementById("popupInstrucoes");
+const fecharPopupBtn = document.getElementById("fecharPopup");
+
+const reiniciarBtn = document.getElementById("reiniciar");
+const selectDificuldade = document.getElementById("dificuldade");
+const htpbBtn = document.getElementById("htpb");
+
+const popupHTPB = document.getElementById("popupHTPB");
+const fecharHTPBBtn = document.getElementById("fecharHTPB");
+
+let pontuacao = 0;
+let tempo = 0;
+let intervalo = null;
+let dificuldadeAtual = 'facil';
+let corTimeout = null;
+let tempoMaximo = 30;  
+
+const duracoes = { facil: 5000, medio: 3000, dificil: 1000 };
+
+ function iniciarCronometro() {
+  if (intervalo) clearInterval(intervalo);
+  intervalo = setInterval(() => {
+    tempo++;
+    timerEl.textContent = "Tempo: " + (tempoMaximo - tempo) + "s";
+    if (tempo >= tempoMaximo) fimDeJogo();
+  }, 1000);
+}
+
+function pausarCronometro() {
+  if (intervalo) clearInterval(intervalo);
+}
+
+ function iniciarJogo() {
+  if (corTimeout) clearTimeout(corTimeout);
+  pontuacao = 0;
+  tempo = 0;
+  scoreEl.textContent = "Pontuação: 0";
+  timerEl.textContent = "Tempo: " + tempoMaximo + "s";
+  restartBtn.style.display = "none";
+  gameContainer.style.display = "block";
+  gerarRodada();
+  iniciarCronometro();
+}
+
+ function gerarRodada() {
+  buttonsEl.innerHTML = "";
+  const indiceTexto = Math.floor(Math.random() * cores.length);
+  const indiceCor = Math.floor(Math.random() * valores.length);
+  wordEl.textContent = cores[indiceTexto];
+  wordEl.style.color = valores[indiceCor];
+  const respostaCorreta = valores[indiceCor];
+
+  valores.forEach((cor, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = cores[i];
+    btn.style.backgroundColor = cor;
+    btn.addEventListener("click", () => verificarResposta(cor, respostaCorreta));
+    buttonsEl.appendChild(btn);
+  });
+
+  if (corTimeout) clearTimeout(corTimeout);
+  corTimeout = setTimeout(() => {
+    wordEl.textContent = "?";
+    wordEl.style.color = "#000";
+  }, duracoes[dificuldadeAtual]);
+}
+
+ function verificarResposta(escolhida, correta) {
+  if (escolhida === correta) {
+    pontuacao++;
+     switch (dificuldadeAtual) {
+      case 'facil':
+        tempo = Math.max(0, tempo - 5); 
+        break;
+      case 'medio':
+        tempo = Math.max(0, tempo - 3);
+        break;
+      case 'dificil':
+        tempo = Math.max(0, tempo - 2);
+        break;
+    }
+  } else {
+     if (dificuldadeAtual === 'dificil') {
+      tempo += 2;  
+      if (tempo >= tempoMaximo) fimDeJogo();
+    }
+  }
+
+  scoreEl.textContent = "Pontuação: " + pontuacao;
+  gerarRodada();
+}
+
+ function fimDeJogo() {
+  pausarCronometro();
+  if (corTimeout) clearTimeout(corTimeout);
+  wordEl.textContent = "⏰ Fim de jogo!";
+  wordEl.style.color = "#333";
+  buttonsEl.innerHTML = "";
+  restartBtn.style.display = "inline-block";
+  alert("Tempo esgotado!\nPontuação final: " + pontuacao);
+}
+
+ window.onload = () => {
+  popup.style.display = "flex";
+  gameContainer.style.display = "none";
+};
+
+fecharPopupBtn.addEventListener("click", () => {
+  popup.style.display = "none";
+  gameContainer.style.display = "block";
+  iniciarJogo();
+});
+
+htpbBtn.addEventListener("click", () => {
+  popupHTPB.style.display = "flex";
+  pausarCronometro();
+  gameContainer.style.display = "none";
+});
+
+fecharHTPBBtn.addEventListener("click", () => {
+  popupHTPB.style.display = "none";
+  gameContainer.style.display = "block";
+  iniciarCronometro();
+});
+
+ restartBtn.addEventListener("click", iniciarJogo);
+reiniciarBtn.addEventListener("click", iniciarJogo);
+
+ selectDificuldade.addEventListener("change", () => {
+  dificuldadeAtual = selectDificuldade.value;
+  iniciarJogo();
+});
+</script>
+<script>(function () {
+    const socket = io();
+    const meuId = "<%= usuario ? usuario.id : '' %>";
+
+    socket.emit('registrarId', meuId);
+
+    const contador = document.getElementById('contadorConvite');
+    let notificacoes = parseInt(localStorage.getItem('notificacoes') || '0');
+    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+
+    function atualizarContador() {
+        if (notificacoes > 0) {
+            contador.style.display = 'inline-block';
+            contador.textContent = notificacoes;
+        } else {
+            contador.style.display = 'none';
+        }
+        localStorage.setItem('notificacoes', notificacoes);
+    }
+
+    function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+    }
+
+    document.getElementById('linkConvite').addEventListener('click', () => {
+        notificacoes = 0;
+        atualizarContador();
+    });
+
+    socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    atualizarContador();
+})();</script>
+</body>
+</html>

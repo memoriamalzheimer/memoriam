@@ -1,20 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <link rel="icon" type="image/png" href="../assets/favicon/cerebro.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Eu">
-    <link rel="stylesheet" href="Chess.css">
-    
-    <title>Chess</title>
+    <link rel="stylesheet" href="/css/Chess.css">
+      <script src="/socket.io/socket.io.js"></script>    
+    <title>Xadrez</title>
 </head>
 
 
 <body>
+        <h1>Xadrez</h1>
 
-    <h1>Chess</h1>
+<div class="controls">
+
+        <label for="idOponente">Convidar ID:</label>
+        <input id="idOponente" type="text" placeholder="ID do jogador">
+        <button id="btnConvidar">Convidar</button>
+        <button id="reiniciar">Reiniciar</button>
+        <button id="instrucoesBtn">Como jogar</button>
+      </div>
     <h2 id="tog">Vez do Branco</h2>
 
 
@@ -104,7 +113,61 @@
         </div>
 
     </ul>
-    <script src="Chess.js"></script>
+    <div id="popupInicio">
+    <div class="conteudo">
+        <h2>Bem-vindo ao Xadrez!</h2>
+        <p>Deixe o Rei adversário em Xeque e vença a partida.</p>
+        <button id="fecharPopupInicio">Entendi</button>
+    </div>
+</div>
+    <script src="/js/Chess.js"></script>
+    <script>(function () {
+    const socket = io();
+    const meuId = "<%= usuario ? usuario.id : '' %>";
+
+    socket.emit('registrarId', meuId);
+
+    const contador = document.getElementById('contadorConvite');
+    let notificacoes = parseInt(localStorage.getItem('notificacoes') || '0');
+    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+
+    function atualizarContador() {
+        if (notificacoes > 0) {
+            contador.style.display = 'inline-block';
+            contador.textContent = notificacoes;
+        } else {
+            contador.style.display = 'none';
+        }
+        localStorage.setItem('notificacoes', notificacoes);
+    }
+
+    function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+    }
+
+    document.getElementById('linkConvite').addEventListener('click', () => {
+        notificacoes = 0;
+        atualizarContador();
+    });
+
+    socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    atualizarContador();
+})();</script>
 </body>
 
 <script>

@@ -7,19 +7,33 @@
   box-sizing: border-box;
 }
 
-.texto p{
-    text-align: justify;
+.texto p {
+  text-align: justify;
 }
+
 p {
   margin-bottom: 1.2rem;
   line-height: 1.5;
 }
-.dropdown-login{
-   z-index: 10000;
+
+.dropdown-login {
+  z-index: 10000;
 }
+
+#contadorConvite {
+  display: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  margin-left: 5px;
+
+}
+
 .fundo {
   width: 100%;
-  min-height: 50vh;  
+  min-height: 50vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -48,7 +62,7 @@ p {
 .fundo h1 {
   position: relative;
   z-index: 1;
-  font-size: 1.8rem;  
+  font-size: 1.8rem;
   text-align: center;
   text-shadow: 0.125rem 0.125rem 0.625rem rgba(0, 0, 0, 0.7);
 }
@@ -91,6 +105,13 @@ p {
   transform: translateY(20px);
   animation: fadeUp 1s ease forwards;
 }
+#sobre > p,
+#sobre .sintomas li,
+#sobre .linha .texto p {
+    font-size: 1.3rem;  
+    line-height: 1.7;    
+    text-align: justify; 
+}
 
 @keyframes fadeUp {
   to {
@@ -107,7 +128,7 @@ p {
   border-bottom: 1.5px solid #004279;
 }
 
-.sintomas li{
+.sintomas li {
   margin-top: 1.5rem;
 }
 
@@ -119,7 +140,7 @@ p {
   margin-bottom: 3rem;
 }
 
-.linha > div {
+.linha>div {
   flex: 1 1 50%;
   padding: 0.8rem;
 }
@@ -134,6 +155,11 @@ p {
   border-radius: 0.4rem;
   object-fit: cover;
 }
+.linha .texto p {
+    font-size: 1.5rem;  
+    line-height: 1.7;  
+    text-align: justify;  
+}
 
 .conteudo {
   display: flex;
@@ -143,7 +169,7 @@ p {
   margin: 1.5rem 0;
 }
 
-.conteudo > div {
+.conteudo>div {
   flex: 1 1 220px;
   max-width: 260px;
   min-width: 220px;
@@ -155,7 +181,7 @@ p {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.conteudo > div:hover {
+.conteudo>div:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
 }
@@ -196,12 +222,12 @@ p {
     flex-direction: column;
   }
 
-  .linha > div {
+  .linha>div {
     flex: 1 1 100%;
     text-align: center;
   }
 
-  .conteudo > div {
+  .conteudo>div {
     flex: 1 1 45%;
     max-width: 45%;
   }
@@ -217,7 +243,7 @@ p {
     font-size: 1.5rem;
   }
 
-  .conteudo > div {
+  .conteudo>div {
     flex: 1 1 100%;
     max-width: 100%;
   }
@@ -293,13 +319,13 @@ p {
     filter: brightness(0.85);
   }
 
-  .conteudo > div {
+  .conteudo>div {
     background-color: #1f2937;
     color: #e5e7eb;
     box-shadow: 0 3px 6px rgba(255, 255, 255, 0.05);
   }
 
-  .conteudo > div:hover {
+  .conteudo>div:hover {
     box-shadow: 0 6px 12px rgba(255, 255, 255, 0.6);
   }
 

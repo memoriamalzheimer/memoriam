@@ -1,93 +1,207 @@
-const imagens = [
-  "/assets/jogos/quebra1.jpg",
-  "/assets/jogos/quebra2.jpg",
-  "/assets/jogos/quebra3.jpg"
-];
- 
-const imagemEscolhida = imagens[Math.floor(Math.random() * imagens.length)];
-const linhas = 12;
-const colunas = 12;
-let tentativas = 0;
-let tempo = 0;
-let timer;
-let pecas = [];
-let embaralhadas = [];
- 
-function iniciarJogo() {
-  const tabuleiro = document.getElementById("tabuleiro");
-  tabuleiro.innerHTML = "";
-  tabuleiro.style.gridTemplateRows = `repeat(${linhas}, 1fr)`;
-  tabuleiro.style.gridTemplateColumns = `repeat(${colunas}, 1fr)`;
- 
-  pecas = [];
-  for (let i = 0; i < linhas * colunas; i++) pecas.push(i);
-  embaralhadas = pecas.slice().sort(() => Math.random() - 0.5);
- 
-  embaralhadas.forEach((index, i) => {
-    const div = document.createElement("div");
-    div.classList.add("peca");
-    div.style.backgroundImage = `url(${imagemEscolhida})`;
-    div.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
-    div.style.backgroundPosition = `${(index % colunas) * (100 / (colunas - 1))}% ${(Math.floor(index / colunas)) * (100 / (linhas - 1))}%`;
-    div.dataset.index = index;
-    div.draggable = true;
-    div.addEventListener("dragstart", arrastar);
-    div.addEventListener("dragover", permitirSoltar);
-    div.addEventListener("drop", soltar);
-    tabuleiro.appendChild(div);
-  });
- 
-  tentativas = 0;
-  tempo = 0;
-  document.getElementById("tentativas").textContent = "Tentativas: 0";
-  document.getElementById("tempo").textContent = "Tempo: 00:00";
- 
-  if (timer) clearInterval(timer);
-  timer = setInterval(() => {
-    tempo++;
-    const m = String(Math.floor(tempo / 60)).padStart(2, "0");
-    const s = String(tempo % 60).padStart(2, "0");
-    document.getElementById("tempo").textContent = `Tempo: ${m}:${s}`;
-  }, 1000);
+let imagemSelecionada = null;
+const grade = document.getElementById("grade");
+let linhas = 4;   
+let colunas = 6;  
+
+ function selecionarImagem(imgNome, elementoHTML) {
+    imagemSelecionada = imgNome;
+
+    document.querySelectorAll(".opcao-img").forEach(div => {
+        div.classList.remove("selecionada");
+    });
+    elementoHTML.classList.add("selecionada");
+
+    document.getElementById("btn-iniciar").disabled = false;
+
+    ajustarReferencia(imgNome);  
 }
- 
-function arrastar(e) {
-  e.dataTransfer.setData("text", e.target.dataset.index);
+
+function definirDificuldade(nivel) {
+    if (nivel === "facil") {
+        linhas = 3;
+        colunas = 4;
+    } else if (nivel === "medio") {
+        linhas = 4;
+        colunas = 6;
+    } else if (nivel === "dificil") {
+        linhas = 6;
+        colunas = 8;
+    }
 }
- 
-function permitirSoltar(e) {
-  e.preventDefault();
+
+ function abrirPopupInicio() {
+    if (!imagemSelecionada) return;
+
+    document.getElementById("preview-img").src = imagemSelecionada;
+    document.getElementById("popv-iniciar").style.display = "flex";
 }
- 
-function soltar(e) {
-  e.preventDefault();
-  const origem = e.dataTransfer.getData("text");
-  const destino = e.target.dataset.index;
-  const idxOrigem = embaralhadas.indexOf(parseInt(origem));
-  const idxDestino = embaralhadas.indexOf(parseInt(destino));
-  [embaralhadas[idxOrigem], embaralhadas[idxDestino]] = [embaralhadas[idxDestino], embaralhadas[idxOrigem]];
-  tentativas++;
-  atualizarTabuleiro();
-  verificarVitoria();
+
+document.getElementById("btn-confirmar-inicio").onclick = function () {
+    document.getElementById("popv-iniciar").style.display = "none";
+    iniciarJogo();
+};
+
+document.getElementById("btn-cancelar-inicio").onclick = function () {
+    document.getElementById("popv-iniciar").style.display = "none";
+};
+
+ function iniciarJogo() {
+    if (!imagemSelecionada) return;
+
+    document.getElementById("tela-selecao").style.display = "none";
+    document.getElementById("tela-jogo").style.display = "block";
+
+    document.getElementById("img-referencia").src = imagemSelecionada;
+
+    criarPecas();
+
+    document.getElementById("popv-como-jogar").style.display = "flex";
 }
- 
-function atualizarTabuleiro() {
-  const tabuleiro = document.getElementById("tabuleiro");
-  const divs = tabuleiro.querySelectorAll(".peca");
-  divs.forEach((div, i) => {
-    const index = embaralhadas[i];
-    div.style.backgroundPosition = `${(index % colunas) * (100 / (colunas - 1))}% ${(Math.floor(index / colunas)) * (100 / (linhas - 1))}%`;
-  });
-  document.getElementById("tentativas").textContent = `Tentativas: ${tentativas}`;
+
+document.getElementById("btn-fechar-como-jogar").onclick = function () {
+    document.getElementById("popv-como-jogar").style.display = "none";
+    embaralhar(100);
+};
+
+ const imgRef = document.getElementById('img-referencia');
+const containerRef = imgRef.parentElement;
+
+function ajustarReferencia(src) {
+    imgRef.src = src;
+    imgRef.onload = () => {
+         containerRef.style.aspectRatio = `${imgRef.naturalWidth} / ${imgRef.naturalHeight}`;
+         imgRef.style.objectFit = "cover";
+        imgRef.style.objectPosition = "center";
+    }
 }
- 
-function verificarVitoria() {
-  const venceu = embaralhadas.every((val, idx) => val === pecas[idx]);
-  if (venceu) {
-    clearInterval(timer);
-    alert(`Parabéns! Você completou o quebra-cabeça em ${tentativas} tentativas e ${tempo} segundos.`);
-  }
+
+ function criarPecas() {
+    grade.innerHTML = "";
+    for (let i = 0; i < linhas; i++) {
+        for (let j = 0; j < colunas; j++) {
+            const novaPeca = document.createElement("div");
+            novaPeca.id = `x${j}y${i}`;
+            novaPeca.style.top = `${(i * 100) / linhas}%`;
+            novaPeca.style.left = `${(j * 100) / colunas}%`;
+            novaPeca.style.width = `${100 / colunas}%`;
+            novaPeca.style.height = `${100 / linhas}%`;
+            novaPeca.style.backgroundImage = `url(${imagemSelecionada})`;
+            novaPeca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
+            novaPeca.style.backgroundPosition = `${(j / (colunas - 1)) * 100}% ${(i / (linhas - 1)) * 100}%`;
+            novaPeca.setAttribute("onclick", "clicarPeca(this)");
+            grade.appendChild(novaPeca);
+        }
+    }
 }
- 
-document.getElementById("reiniciar").addEventListener("click", iniciarJogo);
-window.onload = iniciarJogo;
+
+ let escolhido1 = null;
+let escolhido2 = null;
+
+function clicarPeca(argElemento) {
+    if (!escolhido1) {
+        escolhido1 = argElemento;
+    } else if (!escolhido2) {
+        escolhido2 = argElemento;
+        trocarPeca();
+    }
+}
+
+function embaralhar(argIteracoes) {
+    for (let i = 0; i < argIteracoes; i++) {
+        let escolhido1X = 0;
+        let escolhido1Y = 0;
+        let escolhido2X = 0;
+        let escolhido2Y = 0;
+
+        while (escolhido1X === escolhido2X && escolhido1Y === escolhido2Y) {
+            escolhido1X = Math.floor(Math.random() * colunas);
+            escolhido1Y = Math.floor(Math.random() * linhas);
+
+            escolhido2X = Math.floor(Math.random() * colunas);
+            escolhido2Y = Math.floor(Math.random() * linhas);
+        }
+
+        escolhido1 = document.getElementById(`x${escolhido1X}y${escolhido1Y}`);
+        escolhido2 = document.getElementById(`x${escolhido2X}y${escolhido2Y}`);
+        trocarPeca();
+    }
+}
+
+function trocarPeca() {
+    const tempTop = escolhido1.style.top;
+    const tempLeft = escolhido1.style.left;
+
+    escolhido1.style.top = escolhido2.style.top;
+    escolhido1.style.left = escolhido2.style.left;
+
+    escolhido2.style.top = tempTop;
+    escolhido2.style.left = tempLeft;
+
+    escolhido1 = null;
+    escolhido2 = null;
+
+    validar();
+}
+
+ function validar() {
+    for (let i = 0; i < linhas; i++) {
+        for (let j = 0; j < colunas; j++) {
+            const peca = document.getElementById(`x${j}y${i}`);
+            
+            const leftEsperado = (j * 100) / colunas;
+            const topEsperado = (i * 100) / linhas;
+
+            const leftAtual = parseFloat(peca.style.left);
+            const topAtual = parseFloat(peca.style.top);
+
+             if (Math.abs(leftEsperado - leftAtual) > 0.1 || Math.abs(topEsperado - topAtual) > 0.1) {
+                return;  
+            }
+        }
+    }
+
+    popupVence();
+}
+
+function popupVence() {
+    const popv = document.getElementById("popv-vitoria");
+    popv.style.display = "flex";
+    document.getElementById("btn-reiniciar").onclick = reiniciarJogo;
+}
+
+function reiniciarJogo() {
+    document.getElementById("popv-vitoria").style.display = "none";
+    voltarParaTelaInicial();
+}
+
+ document.getElementById("btn-voltar").onclick = function () {
+    document.getElementById("popv-sair").style.display = "flex";
+};
+
+document.getElementById("btn-confirmar-sair").onclick = function () {
+    document.getElementById("popv-sair").style.display = "none";
+    voltarParaTelaInicial();
+};
+
+document.getElementById("btn-cancelar-sair").onclick = function () {
+    document.getElementById("popv-sair").style.display = "none";
+};
+
+function voltarParaTelaInicial() {
+    grade.innerHTML = "";
+    document.getElementById("tela-jogo").style.display = "none";
+    document.getElementById("tela-selecao").style.display = "block";
+
+    document.querySelectorAll(".opcao-img").forEach(div => div.classList.remove("selecionada"));
+    document.getElementById("btn-iniciar").disabled = true;
+
+    imagemSelecionada = null;
+}
+
+ window.onload = () => {
+    document.getElementById("popupInicio").style.display = "flex";
+};
+
+document.getElementById("fecharPopupInicio").onclick = () => {
+    document.getElementById("popupInicio").style.display = "none";
+};

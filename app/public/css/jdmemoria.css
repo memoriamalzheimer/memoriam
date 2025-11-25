@@ -17,6 +17,7 @@ body {
 
 header {
   display: flex;
+  margin-top: 15px;
   gap: 12px;
   align-items: center;
   flex-direction: column;
@@ -53,7 +54,12 @@ button {
   color: #111827;
   cursor: pointer;
 }
-
+button:hover{
+  transform: scale(1.05);
+  opacity: 1;
+  background-color: #2b91eb;
+  color:#e6edf3;
+}
 .game-area {
   display: flex;
   flex-direction: column;
@@ -152,8 +158,7 @@ button {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  justify-content: center;
+   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
@@ -184,21 +189,82 @@ button {
 .popv .btn:hover {
   background-color: #60a5fa;
 }
+#popupInicio {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+#popupInicio .conteudo {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: #111827;
+}
+#popipInicio .conteudo h2, p{
+  margin-top: 15px;
+}
+#popupInicio button {
+  background: #137fd9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#popupInicio button:hover {
+  background: #0d5fa7;
+}
+
+@media (prefers-color-scheme: dark) {
+  #popupInicio .conteudo {
+    background: #0f1724;
+    color: #e6edf3;
+  }
+}
 
 #comoj {
+display: none;
   position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
   justify-content: center;
+  align-items: center;
+  z-index: 2000;
 }
 
 #comoj .conteudo {
-  background: white;
-  padding: 18px;
-  border-radius: 10px;
-  max-width: 90%;
+ background: white;
+  border-radius: 15px;
+  padding: 25px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   color: #111827;
+}
+
+#comoj .conteudo h2,p{
+  margin-bottom: 15px;
+}
+
+#comoj button{
+  background: #137fd9
 }
 
 @media (prefers-color-scheme: dark) {

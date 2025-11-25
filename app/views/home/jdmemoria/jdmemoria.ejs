@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Jogo da Memória</title>
+    <link rel="stylesheet" type="text/css" href="./css/jdmemoria.css">
+    <link rel="icon" type="image/png" href="../../../assets/favicon/cerebro.png">
+    <script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body>
+    <header>
+        <h1>Jogo da Memória</h1>
+        <div class="controls">
+            <button id="htpb">Como jogar</button>
+            <button onclick="restartGame()">Reiniciar</button>
+        </div>
+    </header>
+
+    <br />
+ <a href="/convite" id="linkConvite" hidden>
+     <span id="contadorConvite"  hidden></span>
+  </a>
+
+    <div class="game-area">
+        <div class="grid-container"></div>
+
+        <div class="info">
+            <div class="score-actions">
+                <p class="Bp">Pontuação: <span class="score"></span></p>
+                <div class="actions"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="popv-vitoria" class="popv">
+        <div class="popv-conteudo">
+            <h3>Parabéns! Você encontrou todos os pares!</h3>
+            <div class="botoes">
+                <a href="/jogos" class="btn">Voltar</a>
+                <button id="btn-reiniciar" class="btn">Jogar Novamente</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="comoj" style="display:none">
+        <div class="conteudo">
+            <h2>Como jogar</h2>
+            <p>
+                Clique em uma carta na tela para virá-la e, depois, escolha outra para tentar formar um par.
+                Se as cartas forem iguais, elas permanecem viradas e contabilizam um ponto;
+                caso contrário, as duas cartas serão viradas novamente.
+            </p>
+            <button id="fecharComoj">Entendi</button>
+        </div>
+    </div>
+
+    <div id="popupInicio" class="popv" style="display: none;">
+        <div class="popv-conteudo">
+            <h2>Bem-vindo ao Jogo da Memória!</h2>
+            <p>Encontre todos os pares e tente bater seu próprio recorde.</p>
+            <button id="fecharPopupInicio" class="btn">Começar</button>
+        </div>
+    </div>
+
+    <script src="./js/jdmemoria.js"></script>
+    <script> 
+        (function () {
+    const socket = io();
+    const meuId = "<%= usuario ? usuario.id : '' %>";
+
+    socket.emit('registrarId', meuId);
+
+    const contador = document.getElementById('contadorConvite');
+    let notificacoes = parseInt(localStorage.getItem('notificacoes') || '0');
+    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+
+    function atualizarContador() {
+        if (notificacoes > 0) {
+            contador.style.display = 'inline-block';
+            contador.textContent = notificacoes;
+        } else {
+            contador.style.display = 'none';
+        }
+        localStorage.setItem('notificacoes', notificacoes);
+    }
+
+    function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+    }
+
+    document.getElementById('linkConvite').addEventListener('click', () => {
+        notificacoes = 0;
+        atualizarContador();
+    });
+
+    socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    atualizarContador();
+})();
+    </script>
+</body>
+
+</html>

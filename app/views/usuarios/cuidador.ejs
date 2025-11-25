@@ -2,81 +2,160 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="/assets/favicon/cerebro.png">
-    <link rel="stylesheet" href="/css/configgerais.css">
-    <link rel="stylesheet" href="/css/cuidador.css">
-    <title>Memoriam: Início</title>
+  <meta charset="UTF-8">
+  <title>Cuidador — Painel</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="/css/configgerais.css">
+  <link rel="stylesheet" href="/css/cuidador.css">
+  <style>
+    body { font-family: Inter, Arial; background:#f3f4f6; color:#111827; padding:20px; }
+    .wrap { max-width:1000px; margin:0 auto; display:flex; gap:16px; }
+    .panel { background:#fff; padding:14px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    .left { flex:1; }
+    .right { width:320px; }
+    label { display:block; margin-top:8px; font-weight:600; }
+    input, select, textarea { width:100%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #e2e8f0; box-sizing:border-box; }
+    button.btn { margin-top:12px; padding:10px 12px; border:0; border-radius:8px; background:#0b74de; color:white; cursor:pointer; }
+    .user-item { padding:10px; border-radius:8px; margin-bottom:8px; background:#f3f9ff; border:1px solid #dbeefd; display:flex; justify-content:space-between; align-items:center; }
+    .small { font-size:13px; color:#6b7280; }
+    .btn-concluido { padding:4px 8px; background:#047857; color:white; border:0; border-radius:6px; cursor:pointer; font-size:12px; }
+  </style>
 </head>
 
 <body>
-    <header>
-        <nav class="itens">
-            <ul>
-                <li class="logo">
-                    <img src="/assets/logo.png" alt="logo" draggable="false">
-                    <h2>Memoriam</h2>
-                    <span class="social">
-                        <img class="instagram" src="/assets/instagram.svg" draggable="false" alt="Instagram">
-                        <img class="facebook" src="/assets/facebook.svg" draggable="false" alt="Facebook">
-                        <img class="twitter" src="/assets/twitter.svg" draggable="false" alt="Twitter">
-                    </span>
-                </li>
-                <li><a href="#" class="ativo">Início</a></li>
-                <li><a href="/sobre">Sobre</a></li>
-                <li><a href="/jogos">Jogos</a></li>
-                <li><a href="/faq">Perguntas Frequentes</a></li>
+  <div class="wrap">
+    <div class="panel left">
+      <h2>Painel do Cuidador</h2>
+      <p class="small">Seu ID: <strong><%= usuario.id %></strong></p>
 
-                <li class="dropdown-login">
-                    <% if (usuario) { %>
-                        <a href="/logout">Sair</a>
-                        <% } else { %>
-                            <span class="dropdown-toggle">Login ▼</span>
-                            <div class="dropdown-content-login">
-                                <a href="/login">Entrar</a>
-                                <a href="/registro">Registrar</a>
-                            </div>
-                            <% } %>
-                </li>
-            </ul>
-        </nav>
-    </header>
+      <h3>Enviar pedido de cuidador</h3>
 
-    <main>
-        <h3>Enviar Pedido de Cuidador</h3>
-        <form action="/cuidador/enviar-pedido" method="post">
-            <input type="email" name="emailUsuario" placeholder="Email do usuário" required>
-            <button type="submit">Enviar Pedido</button>
-        </form>
+      <label for="usuarioDestino">ID do usuário (destino)</label>
+      <input id="usuarioDestino" placeholder="ID do usuário (ex: abc123)">
 
-    </main>
+      <label for="metaTempo">Tempo de jogo por dia (minutos)</label>
+      <input id="metaTempo" type="number" min="1" placeholder="ex: 30">
 
-    <footer>
-        <div class="footer-top">
-            <ul>
-                <li>Início</li>
-                <li>Sobre</li>
-                <li>Jogos</li>
-            </ul>
-            <ul>
-                <li>Recursos</li>
-                <li>Contato</li>
-                <li>Ajuda</li>
-            </ul>
-            <ul>
-                <li>Recursos</li>
-                <li>Contato</li>
-                <li>Ajuda</li>
-            </ul>
-        </div>
-        <div class="footer-bottom">
-            © 2025 Todos os direitos reservados.
-        </div>
-    </footer>
+      <label for="metaVezesDia">Vezes ao dia</label>
+      <input id="metaVezesDia" type="number" min="1" placeholder="ex: 2">
 
-    <script src="../js/atraso.js"></script>
+      <label for="metaVezesSemana">Vezes por semana</label>
+      <input id="metaVezesSemana" type="number" min="1" placeholder="ex: 5">
 
+      <label for="metaModo">Modo obrigatório</label>
+      <select id="metaModo">
+        <option value="dama">Dama</option>
+        <option value="dama_rapida">Dama Rápida</option>
+        <option value="memoria">Memória</option>
+      </select>
+
+      <label for="metaObjetivo">Objetivo semanal (opcional)</label>
+      <input id="metaObjetivo" placeholder="ex: completar 10 partidas">
+
+      <button id="btnEnviarPedido" class="btn">Enviar pedido de cuidador</button>
+
+      <hr style="margin:18px 0; border:none; border-top:1px solid #eef2f7">
+
+      <h3>Pedidos enviados (últimos)</h3>
+      <div id="pedidosEnviadosList" class="small">
+        Nenhum pedido enviado ainda.
+      </div>
+    </div>
+
+    <div class="panel right">
+      <h3>Usuários que aceitaram</h3>
+      <div id="listaAceitos">
+        <p class="small">Carregando...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const socket = io();
+      const cuidadorId = "<%= usuario.id %>";
+      const listaAceitosEl = document.getElementById('listaAceitos');
+      const pedidosEnviadosEl = document.getElementById('pedidosEnviadosList');
+
+      // Registra no servidor
+      socket.emit('registrarId', cuidadorId);
+
+      // Envio do pedido
+      document.getElementById('btnEnviarPedido').addEventListener('click', () => {
+        const usuarioId = document.getElementById('usuarioDestino').value.trim();
+        if (!usuarioId) return alert('Informe o ID do usuário destino.');
+
+        const metas = {
+          tempo: document.getElementById('metaTempo').value || '',
+          dia: document.getElementById('metaVezesDia').value || '',
+          semana: document.getElementById('metaVezesSemana').value || '',
+          modo: document.getElementById('metaModo').value || '',
+          objetivo: document.getElementById('metaObjetivo').value || ''
+        };
+
+        socket.emit('enviarPedidoCuidador', { cuidadorId, usuarioId, metas });
+
+        const arr = JSON.parse(localStorage.getItem('pedidosCuidadorEnviados') || '[]');
+        arr.unshift({ usuarioId, metas, ts: Date.now() });
+        localStorage.setItem('pedidosCuidadorEnviados', JSON.stringify(arr));
+        renderPedidosEnviados();
+      });
+
+      function renderPedidosEnviados(){
+        const arr = JSON.parse(localStorage.getItem('pedidosCuidadorEnviados') || '[]');
+        if (!arr || arr.length === 0){
+          pedidosEnviadosEl.innerHTML = 'Nenhum pedido enviado ainda.';
+          return;
+        }
+        pedidosEnviadosEl.innerHTML = '';
+        arr.slice(0,8).forEach(p => {
+          const div = document.createElement('div');
+          div.className = 'small';
+          div.style.marginBottom = '8px';
+          div.innerHTML = `<strong>${p.usuarioId}</strong><div>Tempo/dia: ${p.metas.tempo || '-'} min · Modo: ${p.metas.modo || '-'} · Vezes/dia: ${p.metas.dia || '-'}</div>`;
+          pedidosEnviadosEl.appendChild(div);
+        });
+      }
+
+      // Lista de cuidados
+      function renderListaAceitos(lista){
+        listaAceitosEl.innerHTML = '';
+        if (!Array.isArray(lista) || lista.length === 0){
+          listaAceitosEl.innerHTML = '<p class="small">Nenhum usuário ainda aceitou.</p>';
+          return;
+        }
+        lista.forEach(u => {
+          const div = document.createElement('div');
+          div.className = 'user-item';
+          div.dataset.usuario = u;
+          div.innerHTML = `<div><strong>Usuário:</strong> ${u}</div><button class="btn-concluido">Concluído</button>`;
+          div.querySelector('.btn-concluido').addEventListener('click', () => {
+            socket.emit('usuarioConcluiuMeta', { usuarioId: u, cuidadorId });
+            div.remove();
+          });
+          listaAceitosEl.appendChild(div);
+        });
+      }
+
+      // Atualiza lista quando um usuário aceita
+      socket.on('listaCuidadosAtualizada', ({ lista }) => renderListaAceitos(lista));
+
+      // Recebe evento quando usuário conclui meta
+      socket.on('metaConcluida', ({ usuarioId }) => {
+        const div = listaAceitosEl.querySelector(`.user-item[data-usuario="${usuarioId}"]`);
+        if (div) div.remove();
+      });
+
+      socket.on('connect', () => {
+        socket.emit('solicitarListaCuidados', cuidadorId);
+        renderPedidosEnviados();
+      });
+
+      socket.on('pedidoEnviadoCuidador', ({ usuarioId }) => console.log('Pedido enviado para', usuarioId));
+      socket.on('erroCuidador', ({ msg }) => alert('Erro: ' + msg));
+      socket.on('pedidoCuidadorRecusado', ({ pedidoId, usuarioId }) => console.log('Pedido recusado por', usuarioId));
+
+    })();
+  </script>
 </body>
-
 </html>

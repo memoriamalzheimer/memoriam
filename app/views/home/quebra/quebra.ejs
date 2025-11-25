@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="../../../assets/favicon/cerebro.png">
+  <title>Quebra-cabeça</title>
+  <link rel="stylesheet" href="./css/quebra.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <a href="/convite" id="linkConvite" hidden>
+     <span id="contadorConvite"  hidden></span>
+  </a>
+
+    <div id="tela-selecao" class="tela-selecao">
+    <h2>Escolha a imagem do quebra-cabeça</h2>
+
+     <div class="modo">
+      <h2>Fácil:</h2>
+      <div class="lista-imagens">
+        <div class="opcao-img" onclick="definirDificuldade('facil'); selecionarImagem('./js/assets/papagaio.jpeg', this)">
+          <img src="./js/assets/papagaio.jpeg">
+        </div>
+        <div class="opcao-img" onclick="definirDificuldade('facil'); selecionarImagem('./js/assets/golfinho.jpeg', this)">
+          <img src="./js/assets/golfinho.jpeg">
+        </div>
+        <div class="opcao-img" onclick="definirDificuldade('facil'); selecionarImagem('./js/assets/capivara.jpeg', this)">
+          <img src="./js/assets/capivara.jpeg">
+        </div>
+      </div>
+    </div>
+
+     <div class="modo">
+      <h2>Médio:</h2>
+      <div class="lista-imagens">
+        <div class="opcao-img" onclick="definirDificuldade('medio'); selecionarImagem('./js/assets/panda.jpg', this)">
+          <img src="./js/assets/panda.jpg">
+        </div>
+        <div class="opcao-img" onclick="definirDificuldade('medio'); selecionarImagem('./js/assets/tucano.jpg', this)">
+          <img src="./js/assets/tucano.jpg">
+        </div>
+        <div class="opcao-img" onclick="definirDificuldade('medio'); selecionarImagem('./js/assets/sapo.jpg', this)">
+          <img src="./js/assets/sapo.jpg">
+        </div>
+      </div>
+    </div>
+
+     <div class="modo">
+      <h2>Difícil:</h2>
+      <div class="lista-imagens">
+        <div class="opcao-img" onclick="definirDificuldade('dificil'); selecionarImagem('./js/assets/quebra1.jpg', this)">
+          <img src="./js/assets/quebra1.jpg">
+        </div>
+        <div class="opcao-img" onclick="definirDificuldade('dificil'); selecionarImagem('./js/assets/quebra2.webp', this)">
+          <img src="./js/assets/quebra2.webp">
+        </div>
+        <div class="opcao-img" onclick="definirDificuldade('dificil'); selecionarImagem('./js/assets/quebra3.jpg', this)">
+          <img src="./js/assets/quebra3.jpg">
+        </div>
+      </div>
+    </div>
+
+    <button id="btn-iniciar" class="btn" onclick="abrirPopupInicio()" disabled>Iniciar</button>
+  </div>
+
+   <div id="tela-jogo" class="tela-jogo" style="display:none;">
+    <h2>Quebra-cabeça</h2>
+    <button id="btn-voltar" class="btn voltar">Voltar</button>
+    <div id="grade"></div>
+    <br>
+    <p>O quebra-cabeça montado deverá ficar <u>assim:</u></p>
+    <div class="refe"><img id="img-referencia"></div>
+  </div>
+
+
+  
+   <div id="popv-vitoria" class="popv">
+    <div class="popv-conteudo">
+      <h3>Parabéns! Você concluiu o quebra-cabeça!</h3>
+      <button id="btn-reiniciar" class="btn">Jogar Novamente</button>
+    </div>
+  </div>
+
+  <div id="popupInicio">
+    <div class="conteudo">
+        <h2>Bem-vindo ao Jogo da Memória!</h2>
+        <p>Monte a imagem exatamente como ela é!</p>
+        <button id="fecharPopupInicio">Entendi</button>
+    </div>
+  </div>
+
+  <div id="popv-sair" class="popv">
+    <div class="popv-conteudo">
+      <h3>Deseja desistir do quebra-cabeça?</h3>
+      <button id="btn-confirmar-sair" class="btn">Sim, desistir</button>
+      <button id="btn-cancelar-sair" class="btn cancelar">Não</button>
+    </div>
+  </div>
+
+  <div id="popv-iniciar" class="popv">
+    <div class="popv-conteudo">
+      <h3>Confirmar Imagem?</h3>
+      <p>Você deseja iniciar o jogo com esta imagem?</p>
+      <img id="preview-img" style="width:100%;border-radius:6px;margin:10px 0;">
+      <button id="btn-confirmar-inicio" class="btn">Iniciar</button>
+      <button id="btn-cancelar-inicio" class="btn cancelar">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="popv-como-jogar" class="popv">
+    <div class="popv-conteudo">
+      <h3>Como Jogar</h3>
+      <p>Clique em uma peça e depois em outra para trocar.
+        <br><br>Organize até formar a imagem correta.<br><br>Boa sorte!</p>
+      <button id="btn-fechar-como-jogar" class="btn">Entendi</button>
+    </div>
+  </div>
+  
+   <script src="./js/quebra.js"></script>
+
+   <script>
+(function () {
+    const socket = io();
+    const meuId = "<%= usuario ? usuario.id : '' %>";
+
+    socket.emit('registrarId', meuId);
+
+    const contador = document.getElementById('contadorConvite');
+    let notificacoes = parseInt(localStorage.getItem('notificacoes') || '0');
+    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+
+    function atualizarContador() {
+        if (notificacoes > 0) {
+            contador.style.display = 'inline-block';
+            contador.textContent = notificacoes;
+        } else {
+            contador.style.display = 'none';
+        }
+        localStorage.setItem('notificacoes', notificacoes);
+    }
+
+    function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+    }
+
+    document.getElementById('linkConvite').addEventListener('click', () => {
+        notificacoes = 0;
+        atualizarContador();
+    });
+
+    socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+    });
+
+    atualizarContador();
+})();
+  </script>
+</body>
+</html>
