@@ -18,9 +18,18 @@
                     <img src="../assets/logo.png" alt="logo" draggable="false">
                     <h2>Memoriam</h2>
                     <span class="social">
-                        <img class="instagram" src="../assets/instagram.svg" draggable="false" alt="Instagram">
+                        <a href="https://www.instagram.com/memoriam.alzheimer?igsh=MWdkZ2I1dzF2ZWx3YQ==" target="_blank"
+                            style="all: unset; cursor: pointer; display: inline-block; line-height: 0;">
+                            <img class="instagram" src="../assets/instagram.svg" draggable="false" alt="Instagram">
+                        </a>
+                         <a href="https://www.instagram.com/memoriam.alzheimer?igsh=MWdkZ2I1dzF2ZWx3YQ==" target="_blank"
+                            style="all: unset; cursor: pointer; display: inline-block; line-height: 0;">
                         <img class="facebook" src="../assets/facebook.svg" draggable="false" alt="Facebook">
+                         </a>
+                           <a href="https://www.instagram.com/memoriam.alzheimer?igsh=MWdkZ2I1dzF2ZWx3YQ==" target="_blank"
+                            style="all: unset; cursor: pointer; display: inline-block; line-height: 0;">
                         <img class="twitter" src="../assets/twitter.svg" draggable="false" alt="Twitter">
+                         </a>
                     </span>
                 </li>
                 <li><a href="<%= usuario ? '/inicio' : '/' %>">Início</a></li>
@@ -53,29 +62,29 @@
         <div class="grade-jogos">
             <div class="grade1">
                 <a class="card" href="/chess">
-                    <img src="../html/assets/xadrez.svg" alt="Xadrez" loading="lazy">
+                    <img src="../html/assets/xadrez.svg" alt="Xadrez" loading="lazy" draggable="false">
                     <span>Xadrez</span>
                 </a>
                 <a class="card" href="/dama">
-                    <img src="../html/assets/dama.svg" alt="Damas" loading="lazy">
+                    <img src="../html/assets/dama.svg" alt="Damas" loading="lazy" draggable="false">
                     <span>Damas</span>
                 </a>
                 <a class="card" href="/sudoku">
-                    <img src="../html/assets/sudoku.png" alt="Sudoku" loading="lazy">
+                    <img src="../html/assets/sudoku.png" alt="Sudoku" loading="lazy" draggable="false">
                     <span>Sudoku</span>
                 </a>
             </div>
             <div class="grade2">
                 <a class="card" href="/quebra">
-                    <img src="../html/assets/quebra.svg" alt="Quebra-Cabeça">
+                    <img src="../html/assets/quebra.svg" alt="Quebra-Cabeça" draggable="false">
                     <span>Quebra-Cabeça</span>
                 </a>
                 <a class="card" href="/jdmemoria">
-                    <img src="../html/assets/memoria.svg" alt="Jogo da Memória">
+                    <img src="../html/assets/memoria.svg" alt="Jogo da Memória" draggable="false">
                     <span>Jogo da Memória</span>
                 </a>
                 <a class="card" href="/stroop">
-                    <img src="../html/assets/stroop.png" alt="Desafio Stroop">
+                    <img src="../html/assets/stroop.png" alt="Desafio Stroop" draggable="false">
                     <span>Desafio Stroop</span>
                 </a>
             </div>
@@ -90,14 +99,14 @@
                 <li>Jogos</li>
             </ul>
             <ul>
-                <li>Perguntas Frequentes</li>
-                <li>Contato</li>
-                <li>Ajuda</li>
+                <li>FAQ</li>
+                <li>Convites</li>
+                <li>Doação</li>
             </ul>
             <ul>
-                <li>Recursos</li>
-                <li>Contato</li>
-                <li>Ajuda</li>
+                <li>Twitter</li>
+                <li>Instagram</li>
+                <li>Facebook</li>
             </ul>
         </div>
         <div class="footer-bottom">
@@ -105,54 +114,55 @@
         </div>
     </footer>
 
+
     <script src="../../js/atraso.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-    (function () {
-    const socket = io();
-    const meuId = "<%= usuario ? usuario.id : '' %>";
-    socket.emit('registrarId', meuId);
+        (function () {
+            const socket = io();
+            const meuId = "<%= usuario ? usuario.id : '' %>";
+            socket.emit('registrarId', meuId);
 
-    const contador = document.getElementById('contadorConvite');
-    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
-    let notificacoes = convites.length;
+            const contador = document.getElementById('contadorConvite');
+            let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+            let notificacoes = convites.length;
 
-    function atualizarContador() {
-        if (notificacoes > 0) {
-            contador.style.display = 'inline-block';
-            contador.textContent = notificacoes;
-        } else {
-            contador.style.display = 'none';
-        }
-    }
+            function atualizarContador() {
+                if (notificacoes > 0) {
+                    contador.style.display = 'inline-block';
+                    contador.textContent = notificacoes;
+                } else {
+                    contador.style.display = 'none';
+                }
+            }
 
-    function salvarConvites() {
-        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
-    }
+            function salvarConvites() {
+                localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+            }
 
-    document.getElementById('linkConvite').addEventListener('click', () => {
-         notificacoes = 0;
-        atualizarContador();
-    });
+            document.getElementById('linkConvite').addEventListener('click', () => {
+                notificacoes = 0;
+                atualizarContador();
+            });
 
-     socket.on('conviteRecebido', ({ de, conviteId }) => {
-        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
-        notificacoes++;
-        salvarConvites();
-        atualizarContador();
-    });
+            socket.on('conviteRecebido', ({ de, conviteId }) => {
+                const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+                notificacoes++;
+                salvarConvites();
+                atualizarContador();
+            });
 
-    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
-        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
-        notificacoes++;
-        salvarConvites();
-        atualizarContador();
-    });
+            socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+                const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+                notificacoes++;
+                salvarConvites();
+                atualizarContador();
+            });
 
-    atualizarContador();
-})();
+            atualizarContador();
+        })();
     </script>
 </body>
 

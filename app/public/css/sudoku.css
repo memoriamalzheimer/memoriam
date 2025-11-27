@@ -282,14 +282,49 @@ h1 {
 }
 
 @media (max-width: 768px) {
-  #grid {
-    width: 320px;
-    height: 320px;
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  .top-bar {
+    gap: 1rem;
+    margin-top: 15px;
+  }
+
+  .top-bar button,
+  .top-bar select {
+    font-size: 1.4rem;
+    padding: 0.8rem 1.4rem;
+  }
+
+   #grid {
+    width: 420px !important;
+    height: 420px !important;
   }
 
   #selection {
-    height: 320px;
-    width: 45px;
+    height: 420px !important;
+    width: 70px !important;
+  }
+
+  .cell {
+    font-size: 2.4rem !important;
+  }
+
+  .digit {
+    font-size: 2.4rem;
+    height: 65px;
+  }
+
+  #mistakes {
+    font-size: 3rem;
+  }
+
+  #popupInicio .conteudo,
+  #popupInstrucoes .conteudo {
+    width: 85%;
+    font-size: 1.3rem;
   }
 }
 

@@ -40,7 +40,7 @@
     <div class="conteudo">
       <h2>Bem-vindo ao Sudoku</h2>
       <p>Complete o tabuleiro de 9x9 com números de 1 a 9, sem repetir em linhas, colunas ou blocos.</p>
-      <video width="400" height="360" autoplay loop>
+            <video style="width: 100%; height: 300px;" controls autoplay loop>
         <source src="./js/assets/sudoku.mp4" type="video/mp4" autoplay loop>
       </video>
       <button id="fecharInicio">Entendi</button>
@@ -50,9 +50,9 @@
   <div id="popupInstrucoes">
     <div class="conteudo">
       <h2>Como jogar</h2>
-      <p>Complete o tabuleiro de 9x9 com números de 1 a 9, sem repetir em linhas, colunas ou blocos.</p>
-      <video width="320" height="360" autoplay loop>
-        <source src="Sudoku - Brave 2025-11-20 14-37-20.mp4" type="video/mp4">
+      <p>Clique nos números de 1 a 9 à direita e depois clique na cédula sem repetir o mesmo número em linhas, colunas, ou blocos. Seu objetivo é completar todas as partes do sudoku</p>
+            <video style="width: 100%; height: 300px;" controls autoplay loop>
+        <source src="./js/assets/sudoku.mp4" type="video/mp4">
       </video>
       <button id="fecharPopup">Entendi</button>
     </div>
@@ -91,10 +91,10 @@
         localStorage.setItem('convitesPendentes', JSON.stringify(convites));
     }
 
-    document.getElementById('linkConvite').addEventListener('click', () => {
-         notificacoes = 0;
-        atualizarContador();
-    });
+   document.getElementById('linkConvite').addEventListener('click', (e) => {
+    if (!e.isTrusted) return;
+});
+
 
      socket.on('conviteRecebido', ({ de, conviteId }) => {
         const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);

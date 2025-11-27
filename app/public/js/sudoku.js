@@ -5,6 +5,7 @@ let tentativas = 3;
 let bloqueado = false;
 const reiniciarBtn = document.getElementById('reiniciar');
 const selectDificuldade = document.getElementById('dificuldade');
+const somErrado = new Audio('/js/assets/sounds/SudokuErro.wav');
 
 const encodeBoard = (board) =>
     board.reduce(
@@ -95,6 +96,8 @@ const startGame = async (difficulty = 'easy') => {
             bloqueado = true;
             mistakesTxt.style.opacity = '1';
             mistakesTxt.innerHTML = `Você errou! Número de erros: ${mistakes}`;
+
+            somErrado.play()
             setTimeout(() => {
                 mistakesTxt.style.opacity = '0';
                 this.classList.remove('wrong-digit');

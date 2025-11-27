@@ -24,6 +24,10 @@
       </div>
     </header>
 
+    <a href="/convite" id="linkConvite" hidden>
+      <span id="contadorConvite" hidden></span>
+    </a>
+
     <div class="game-area">
       <div id="board" class="board"></div>
       <div class="info">
@@ -41,6 +45,9 @@
       <h2>Como jogar</h2>
       <p>Clique em uma peça sua para selecionar, depois clique na casa de destino. As peças se movem diagonalmente e
         capturam pulando. Ao chegar na última fileira, viram dama e podem andar para trás.</p>
+      <video style="width: 100%; height: 300px;" controls autoplay loop>
+        <source src="./js/assets/dama.webm" type="video/mp4">
+      </video>
       <button id="fecharPopup">Entendi</button>
     </div>
   </div>
@@ -55,6 +62,9 @@
     <div class="conteudo">
       <h2>Bem-vindo ao Jogo de Dama</h2>
       <p>Convide outro jogador pelo ID para começar uma partida online ou jogue local com uma outra pessoa.</p>
+      <video style="width: 100%; height: 300px;" controls autoplay loop>
+        <source src="./js/assets/dama.webm" type="video/webm">
+      </video>
       <button id="fecharPopupInicio">Começar</button>
     </div>
   </div>
@@ -77,6 +87,8 @@
   </div>
 
   <script>
+     const somDama = new Audio('/js/assets/sounds/DamaDama.wav');
+
     document.getElementById("mensagemInput").addEventListener("keyup", function (e) {
       if (e.key === "Enter") document.getElementById('btnEnviarMensagem').click();
     });
@@ -137,29 +149,29 @@
       window.location.href = window.location.pathname + '?sala=' + encodeURIComponent(sala) + '&lado=' + lado;
     });
 
-   document.addEventListener('DOMContentLoaded', () => {
-  boardElement = document.getElementById('board');
-  criarTabuleiro();
-  atualizarStatus();
+    document.addEventListener('DOMContentLoaded', () => {
+      boardElement = document.getElementById('board');
+      criarTabuleiro();
+      atualizarStatus();
 
-  const btnReiniciar = document.getElementById('reiniciar');
-  const btnUndo = document.getElementById('undo');
+      const btnReiniciar = document.getElementById('reiniciar');
+      const btnUndo = document.getElementById('undo');
 
-  btnReiniciar.onclick = reiniciar;
-  btnUndo.onclick = desfazer;
+      btnReiniciar.onclick = reiniciar;
+      btnUndo.onclick = desfazer;
 
-  document.getElementById('instrucoesBtn').onclick = () => document.getElementById('popupInstrucoes').style.display = 'flex';
-  document.getElementById('fecharPopup').onclick = () => document.getElementById('popupInstrucoes').style.display = 'none';
+      document.getElementById('instrucoesBtn').onclick = () => document.getElementById('popupInstrucoes').style.display = 'flex';
+      document.getElementById('fecharPopup').onclick = () => document.getElementById('popupInstrucoes').style.display = 'none';
 
-  if (meuLado) ladoLabel.textContent = meuLado === 'red' ? 'Vermelho' : 'Branco';
+      if (meuLado) ladoLabel.textContent = meuLado === 'red' ? 'Vermelho' : 'Branco';
 
-   if (salaQuery) {
-    btnReiniciar.style.display = 'none';
-    btnUndo.style.display = 'none';
-  }
+      if (salaQuery) {
+        btnReiniciar.style.display = 'none';
+        btnUndo.style.display = 'none';
+      }
 
-  socket.on('movimento', executarMovimentoDoOutro);
-});
+      socket.on('movimento', executarMovimentoDoOutro);
+    });
 
 
     window.onload = () => {
@@ -250,17 +262,20 @@
     function highlightMoves() { possibleMoves.forEach(m => { const c = getCell(m.row, m.col); if (c) c.classList.add(m.capture ? 'capture' : 'highlight'); }); }
     function limparHighlights() { document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight', 'capture')); possibleMoves = []; selectedPiece = null; }
     function clicarCelula(cell) { if (!selectedPiece) return; if (meuLado && turn !== meuLado) return; if (meuLado && !selectedPiece.classList.contains(meuLado)) return; const r = parseInt(cell.dataset.row), c = parseInt(cell.dataset.col); const dest = possibleMoves.find(m => m.row === r && m.col === c); if (dest) moverPeca(selectedPiece, cell, dest.capture); }
-
+  
+const somPeca = new Audio('/js/assets/sounds/xadrezdamapeca.wav');
     function moverPeca(p, destino, captureCell) {
+        
       const origem = p.parentElement;
       destino.appendChild(p);
+      somPeca.play();
       if (captureCell) {
         const cap = captureCell.children[0];
         if (cap) {
           const cor = cap.classList.contains('red') ? 'red' : 'white';
           captureCell.innerHTML = '';
           score[cor]++;
-        }
+         }
       }
       promover(p, destino);
       moveHistory.push({ p, origem, destino, captureCell });
@@ -274,7 +289,18 @@
       verificarVencedor();
     }
 
-    function promover(p, d) { const r = parseInt(d.dataset.row); if (p.classList.contains('red') && r === 0) p.classList.add('king'); if (p.classList.contains('white') && r === 7) p.classList.add('king'); }
+    function promover(p, d) {
+      const r = parseInt(d.dataset.row); 
+       if (p.classList.contains('red') && r === 0 && !p.classList.contains('king')) {
+    p.classList.add('king');
+    somDama.play();
+  }
+
+   if (p.classList.contains('white') && r === 7 && !p.classList.contains('king')) {
+    p.classList.add('king');
+    somDama.play();
+  }
+}
     function trocarTurno() { turn = (turn === 'red') ? 'white' : 'red'; atualizarStatus(); }
     function atualizarStatus() { document.getElementById('turnLabel').textContent = turn === 'red' ? 'Vermelho' : 'Branco'; document.getElementById('scoreRed').textContent = score.red; document.getElementById('scoreWhite').textContent = score.white; }
     function desfazer() { const last = moveHistory.pop(); if (!last) return; last.origem.appendChild(last.p); if (last.captureCell) { const pc = document.createElement('div'); const cor = (last.p && last.p.classList.contains('red')) ? 'white' : ((last.p && last.p.classList.contains('white')) ? 'red' : 'white'); pc.className = 'piece ' + cor; last.captureCell.appendChild(pc); score[cor]--; } if (moveHistory.length === 0) document.getElementById('undo').disabled = true; trocarTurno(); }
@@ -293,8 +319,9 @@
         mostrarPopupVencedor(vencedor);
       }
     }
-
+    const somVitoria = new Audio('js/assets/sounds/Concluir.wav');
     function mostrarPopupVencedor(vencedor) {
+       somVitoria.play();
       const popup = document.getElementById('popupVencedor');
       document.getElementById('vencedorTitulo').textContent = `Vencedor: ${vencedor}`;
       popup.style.display = 'flex';
@@ -304,6 +331,53 @@
         reiniciar();
       };
     }
+  </script>
+  <script>
+    (function () {
+      const socket = io();
+      const meuId = "<%= usuario ? usuario.id : '' %>";
+      socket.emit('registrarId', meuId);
+
+      const contador = document.getElementById('contadorConvite');
+      let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+      let notificacoes = convites.length;
+
+      function atualizarContador() {
+        if (notificacoes > 0) {
+          contador.style.display = 'inline-block';
+          contador.textContent = notificacoes;
+        } else {
+          contador.style.display = 'none';
+        }
+      }
+
+      function salvarConvites() {
+        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+      }
+
+      document.getElementById('linkConvite').addEventListener('click', (e) => {
+        if (!e.isTrusted) return;
+      });
+
+
+      socket.on('conviteRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+      });
+
+      socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+        notificacoes++;
+        salvarConvites();
+        atualizarContador();
+      });
+
+      atualizarContador();
+    })();
   </script>
 </body>
 

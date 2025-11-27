@@ -1,4 +1,8 @@
- * {
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Nunito:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -34,15 +38,19 @@ h1 {
   display: none;
   margin-top: 20px;
 }
-#facil{
+
+#facil {
   color: rgb(30, 221, 30);
 }
-#medio{
+
+#medio {
   color: #FFA500;
 }
-#dificil{
+
+#dificil {
   color: rgb(235, 0, 0);
 }
+
 #word {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
@@ -128,7 +136,7 @@ button:hover,
   align-items: center;
   z-index: 1000;
 }
- 
+
 #popupInstrucoes .conteudo,
 #popupHTPB .conteudo {
   background: white;
@@ -138,16 +146,23 @@ button:hover,
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   color: #111827;
-} 
+   max-height: 80vh;
+  overflow-y: auto;
+}
+
+ 
+ 
 
 #popupInstrucoes .conteudo h2,
 #popupHTPB .conteudo h2 {
-  margin-bottom: 1rem;  
+  margin-bottom: 1rem;
 }
-#popupInstrucoes .conteudo p, 
-#popupHTPB .conteudo p{
+
+#popupInstrucoes .conteudo p,
+#popupHTPB .conteudo p {
   line-height: 2.7;
 }
+
 #popupInstrucoes button,
 #popupHTPB button {
   background: #137fd9;
@@ -165,7 +180,7 @@ button:hover,
   background: #0d5fa7;
 }
 
- @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
   body {
     background: #111827;
     color: #e6edf3;
@@ -182,7 +197,7 @@ button:hover,
   }
 
   #word {
-    color: #e6edf3;  
+    color: #e6edf3;
   }
 
   .top-bar button,
@@ -190,17 +205,19 @@ button:hover,
     background-color: #1f2937;
     color: #e6edf3;
   }
- 
-  
+
+
   .top-bar button:hover,
   .top-bar select:hover {
     background-color: #0d5fa7;
   }
-button:hover{
-      color: #000000;
+
+  button:hover {
+    color: #000000;
     background-color: #0d5fa7;
 
-}
+  }
+
   #score {
     color: #93c5fd;
   }
@@ -232,5 +249,69 @@ button:hover{
   #popupHTPB button:hover {
     background: #137fd9;
   }
-  
+
 }
+@media (max-width: 720px) {
+
+  body {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+   #popupInstrucoes .conteudo,
+  #popupHTPB .conteudo {
+    width: 90%;
+    max-height: 85vh;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  #popupInstrucoes .conteudo video,
+  #popupHTPB .conteudo video {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+   #popupInstrucoes button,
+  #popupHTPB button {
+    margin-top: auto;
+    align-self: center;
+    width: 100%;
+    max-width: 250px;
+  }
+
+   #game-container {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  #word {
+    font-size: 2rem;
+  }
+
+  .btn-container {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  button,
+  .top-bar button,
+  .top-bar select {
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .top-bar {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+}
+ 

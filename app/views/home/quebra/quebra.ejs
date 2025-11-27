@@ -72,9 +72,8 @@
     <div class="refe"><img id="img-referencia"></div>
   </div>
 
-
-  
-   <div id="popv-vitoria" class="popv">
+ 
+    <div id="popv-vitoria" class="popv">
     <div class="popv-conteudo">
       <h3>Parabéns! Você concluiu o quebra-cabeça!</h3>
       <button id="btn-reiniciar" class="btn">Jogar Novamente</button>
@@ -84,7 +83,11 @@
   <div id="popupInicio">
     <div class="conteudo">
         <h2>Bem-vindo ao Jogo da Memória!</h2>
-        <p>Monte a imagem exatamente como ela é!</p>
+        <p>Escolha uma dificuldade e monte a imagem exatamente como ela é! </p>
+          <p> Quanto maior a dificuldade, mais repartida a imagem fica.</p>
+            <video style="width: 100%; height: 300px;" controls autoplay loop>
+        <source src="./js/assets/quebra.webm"  type="video/webm">
+      </video>
         <button id="fecharPopupInicio">Entendi</button>
     </div>
   </div>
@@ -112,6 +115,9 @@
       <h3>Como Jogar</h3>
       <p>Clique em uma peça e depois em outra para trocar.
         <br><br>Organize até formar a imagem correta.<br><br>Boa sorte!</p>
+          <video style="width: 100%; height: 300px;" controls autoplay loop>
+        <source src="./js/assets/quebra.webm"  type="video/webm">
+      </video>
       <button id="btn-fechar-como-jogar" class="btn">Entendi</button>
     </div>
   </div>
@@ -122,12 +128,11 @@
 (function () {
     const socket = io();
     const meuId = "<%= usuario ? usuario.id : '' %>";
-
     socket.emit('registrarId', meuId);
 
     const contador = document.getElementById('contadorConvite');
-    let notificacoes = parseInt(localStorage.getItem('notificacoes') || '0');
     let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+    let notificacoes = convites.length;
 
     function atualizarContador() {
         if (notificacoes > 0) {
@@ -136,19 +141,18 @@
         } else {
             contador.style.display = 'none';
         }
-        localStorage.setItem('notificacoes', notificacoes);
     }
 
     function salvarConvites() {
         localStorage.setItem('convitesPendentes', JSON.stringify(convites));
     }
 
-    document.getElementById('linkConvite').addEventListener('click', () => {
-        notificacoes = 0;
-        atualizarContador();
-    });
+   document.getElementById('linkConvite').addEventListener('click', (e) => {
+    if (!e.isTrusted) return;
+});
 
-    socket.on('conviteRecebido', ({ de, conviteId }) => {
+
+     socket.on('conviteRecebido', ({ de, conviteId }) => {
         const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
         convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
         notificacoes++;

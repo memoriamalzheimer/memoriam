@@ -68,8 +68,10 @@
         { urls: 'stun:stun.l.google.com:19302' }
        ]
     };
+    const somEntrou = new Audio('/js/assets/sounds/VChamadaEntrar.wav');
 
     socket.on('connect', () => {
+      somEntrou.play();
       infoStatus.textContent = 'Conectado ao servidor — entrando na sala...';
       socket.emit('joinCall', { sala });
        iniciarMedia();
@@ -159,8 +161,7 @@
       return pc;
     }
 
-    // controls
-    toggleCamBtn.onclick = () => {
+     toggleCamBtn.onclick = () => {
       if (!localStream) return;
       camEnabled = !camEnabled;
       localStream.getVideoTracks().forEach(t => t.enabled = camEnabled);
@@ -172,28 +173,37 @@
       localStream.getAudioTracks().forEach(t => t.enabled = micEnabled);
       toggleMicBtn.textContent = micEnabled ? 'Desligar Microfone' : 'Ligar Microfone';
     };
+    const somSair = new Audio('/js/assets/sounds/VChamadaSair.wav');
+    endCallBtn.onclick = async () => {
+  await encerrar();
+  window.location.href = '/convite';
+};
 
-    endCallBtn.onclick = () => {
-      encerrar();
-      window.location.href = '/convite';
-    };
+    async function encerrar() {
+  try {
+     await new Promise(resolve => {
+      somSair.currentTime = 0;
+      somSair.play();
+      somSair.onended = resolve;
+    });
 
-    function encerrar() {
-      try {
-        socket.emit('leaveCall', { sala });
-      } catch(e){}
-      if (pc) {
-        try { pc.getSenders().forEach(s => { try { if (s.track) s.track.stop(); } catch(e){} }); } catch(e){}
-        try { pc.close(); } catch(e){}
-        pc = null;
-      }
-      if (localStream) {
-        try { localStream.getTracks().forEach(t => t.stop()); } catch(e){}
-        localStream = null;
-      }
-      remoteVideo.srcObject = null;
-      localVideo.srcObject = null;
-    }
+    socket.emit('leaveCall', { sala });
+  } catch(e){}
+
+  if (pc) {
+    try { pc.getSenders().forEach(s => { try { if (s.track) s.track.stop(); } catch(e){} }); } catch(e){}
+    try { pc.close(); } catch(e){}
+    pc = null;
+  }
+
+  if (localStream) {
+    try { localStream.getTracks().forEach(t => t.stop()); } catch(e){}
+    localStream = null;
+  }
+
+  remoteVideo.srcObject = null;
+  localVideo.srcObject = null;
+}
 
      socket.on('peer-joined', ({ id }) => {
        if (!pc) {
@@ -208,5 +218,6 @@
 
   })();
 </script>
+ 
 </body>
 </html>

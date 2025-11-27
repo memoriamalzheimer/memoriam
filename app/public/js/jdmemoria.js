@@ -72,6 +72,7 @@ function flipCard() {
   secondCard = this;
   checkForMatch();
 }
+const somAcerto = new Audio('js/assets/sounds/JDMacerto.wav');
 
 function checkForMatch() {
   let isMatch = firstCard.dataset.name === secondCard.dataset.name;
@@ -79,6 +80,7 @@ function checkForMatch() {
 }
 
 function disableCards() {
+  somAcerto.play();
   firstCard.removeEventListener("click", flipCard);
   secondCard.removeEventListener("click", flipCard);
   resetBoard();
@@ -90,8 +92,9 @@ function disableCards() {
     mostrarPopupVitoria();
   }
 }
-
+const somVitoria = new Audio('js/assets/sounds/Concluir.wav')
 function mostrarPopupVitoria() {
+  somVitoria.play();
   const popv = document.getElementById("popv-vitoria");
   popv.style.display = "flex";
 
@@ -112,8 +115,9 @@ function restartGame() {
   shuffleCards();
   generateCards();
 }
-
+const somErrado = new Audio ('/js/assets/sounds/SudokuErro.wav')
 function unflipCards() {
+  somErrado.play();
   lockBoard = true;
   setTimeout(() => {
     firstCard.classList.remove("flipped");

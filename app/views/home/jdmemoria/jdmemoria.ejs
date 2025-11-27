@@ -20,9 +20,9 @@
     </header>
 
     <br />
- <a href="/convite" id="linkConvite" hidden>
-     <span id="contadorConvite"  hidden></span>
-  </a>
+    <a href="/convite" id="linkConvite" hidden>
+        <span id="contadorConvite" hidden></span>
+    </a>
 
     <div class="game-area">
         <div class="grid-container"></div>
@@ -39,8 +39,9 @@
         <div class="popv-conteudo">
             <h3>Parabéns! Você encontrou todos os pares!</h3>
             <div class="botoes">
-                <a href="/jogos" class="btn">Voltar</a>
                 <button id="btn-reiniciar" class="btn">Jogar Novamente</button>
+                <a href="/jogos" class="btn">Voltar</a>
+
             </div>
         </div>
     </div>
@@ -53,6 +54,9 @@
                 Se as cartas forem iguais, elas permanecem viradas e contabilizam um ponto;
                 caso contrário, as duas cartas serão viradas novamente.
             </p>
+            <video style="width: 100%; height: 300px;" controls autoplay loop>
+                <source src="./js/assets/memoria.webm" type="video/webm">
+            </video>
             <button id="fecharComoj">Entendi</button>
         </div>
     </div>
@@ -61,59 +65,60 @@
         <div class="popv-conteudo">
             <h2>Bem-vindo ao Jogo da Memória!</h2>
             <p>Encontre todos os pares e tente bater seu próprio recorde.</p>
+            <video style="width: 100%; height: 300px;" controls autoplay loop>
+                <source src="./js/assets/memoria.webm" type="video/webm">
+            </video>
             <button id="fecharPopupInicio" class="btn">Começar</button>
         </div>
     </div>
 
     <script src="./js/jdmemoria.js"></script>
-    <script> 
+    <script>
         (function () {
-    const socket = io();
-    const meuId = "<%= usuario ? usuario.id : '' %>";
+            const socket = io();
+            const meuId = "<%= usuario ? usuario.id : '' %>";
+            socket.emit('registrarId', meuId);
 
-    socket.emit('registrarId', meuId);
+            const contador = document.getElementById('contadorConvite');
+            let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+            let notificacoes = convites.length;
 
-    const contador = document.getElementById('contadorConvite');
-    let notificacoes = parseInt(localStorage.getItem('notificacoes') || '0');
-    let convites = JSON.parse(localStorage.getItem('convitesPendentes') || '[]');
+            function atualizarContador() {
+                if (notificacoes > 0) {
+                    contador.style.display = 'inline-block';
+                    contador.textContent = notificacoes;
+                } else {
+                    contador.style.display = 'none';
+                }
+            }
 
-    function atualizarContador() {
-        if (notificacoes > 0) {
-            contador.style.display = 'inline-block';
-            contador.textContent = notificacoes;
-        } else {
-            contador.style.display = 'none';
-        }
-        localStorage.setItem('notificacoes', notificacoes);
-    }
+            function salvarConvites() {
+                localStorage.setItem('convitesPendentes', JSON.stringify(convites));
+            }
 
-    function salvarConvites() {
-        localStorage.setItem('convitesPendentes', JSON.stringify(convites));
-    }
+            document.getElementById('linkConvite').addEventListener('click', (e) => {
+                if (!e.isTrusted) return;
+            });
 
-    document.getElementById('linkConvite').addEventListener('click', () => {
-        notificacoes = 0;
-        atualizarContador();
-    });
 
-    socket.on('conviteRecebido', ({ de, conviteId }) => {
-        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-        convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
-        notificacoes++;
-        salvarConvites();
-        atualizarContador();
-    });
+            socket.on('conviteRecebido', ({ de, conviteId }) => {
+                const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                convites.push({ id, tipo: 'jogo', de, timestamp: Date.now() });
+                notificacoes++;
+                salvarConvites();
+                atualizarContador();
+            });
 
-    socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
-        const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-        convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
-        notificacoes++;
-        salvarConvites();
-        atualizarContador();
-    });
+            socket.on('conviteVideoRecebido', ({ de, conviteId }) => {
+                const id = conviteId || 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                convites.push({ id, tipo: 'video', de, timestamp: Date.now() });
+                notificacoes++;
+                salvarConvites();
+                atualizarContador();
+            });
 
-    atualizarContador();
-})();
+            atualizarContador();
+        })();
     </script>
 </body>
 

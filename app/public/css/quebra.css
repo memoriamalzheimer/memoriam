@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Nunito:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 body {
   display: flex;
   flex-direction: column;
@@ -31,7 +35,7 @@ body {
   background: rgba(0, 0, 0, 0.6);
   justify-content: center;
   align-items: center;
-  z-index: 2000;
+  z-index: 3000;
 }
 
 #popupInicio .conteudo {
@@ -226,6 +230,7 @@ p {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  
 }
 
 .popv-conteudo {
@@ -314,6 +319,7 @@ color: #e6edf3;
   .opcao-img img { width: 150px; height: 95px; }
   .refe { max-width: 280px; height: auto; aspect-ratio: 16/9; }
   #grade { max-width: 280px; height: auto; aspect-ratio: 16/9; }
+  
 }
 
 @media (max-width: 1024px) {

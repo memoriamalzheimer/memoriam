@@ -1,5 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Nunito:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 * {
-  font-family: Inter, system-ui, Segoe UI, Arial, sans-serif;
+  font-family: 'Nunito', sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -14,6 +18,7 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+a{text-decoration: none;}
 
 header {
   display: flex;
@@ -168,16 +173,18 @@ button:hover{
   padding: 25px;
   border-radius: 15px;
   text-align: center;
-  width: 300px;
+  width: 400px;
   max-width: 90%;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   animation: aparecer 0.3s ease-out;
   color: #111827;
+ }
+.popv-vitoria > .popv-conteudo{
+  margin-bottom: 15px;
 }
-
 .popv .btn {
   display: inline-block;
-  margin: 10px;
+  margin: 20px;
   padding: 10px 20px;
   background-color: #3b82f6;
   color: white;
